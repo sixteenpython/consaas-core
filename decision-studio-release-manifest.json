@@ -1,5 +1,5 @@
 {
-  "release": "decision-studio-consulting-0.2.0",
+  "release": "decision-studio-conversational-intelligence-0.3.0",
   "date": "2026-08-23",
   "entrypoint": "streamlit_app.py",
   "products": ["careersim", "housewise", "startup"],
@@ -7,10 +7,13 @@
   "policy_version": "product-versioned; CareerSim 0.2.0",
   "profile": "anonymous-session-only",
   "external_inference_required": false,
+  "browser_inference": "optional WebGPU; Apache-2.0 SmolLM2-1.7B; typed validation required",
   "hosted_narration": "optional-explicit-consent",
   "limitations": [
     "Available observations remain illustrative and are not exhaustive",
     "Reference-only official sources require operator review",
+    "Browser inference quality and availability depend on the user device",
+    "The browser runtime is pinned but loaded from a third-party CDN in this bounded release",
     "No output is financial, legal, admission, valuation or investment advice"
   ],
   "rollback": "revert release commit or restore prior Streamlit entrypoint; GKA rollback uses promoted pointer"

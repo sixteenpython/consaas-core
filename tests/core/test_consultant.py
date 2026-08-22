@@ -33,6 +33,18 @@ def test_information_value_changes_question_order() -> None:
     assert selected.question_id == "career_goal"
 
 
+def test_unknown_question_can_be_deferred_without_becoming_an_answer() -> None:
+    questions = (
+        Question("field", "Field?", "choice", importance=80),
+        Question("funding", "Funding?", "choice", importance=70),
+    )
+
+    selected = select_next_question("careersim", questions, {}, frozenset({"field"}))
+
+    assert selected is not None
+    assert selected.question_id == "funding"
+
+
 def test_deterministic_turn_explains_implication() -> None:
     question = Question(
         "runway_months", "Runway?", "number", expert_context="Survival precedes optimisation."

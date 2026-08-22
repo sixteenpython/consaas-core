@@ -36,7 +36,22 @@ def test_landing_and_complete_careersim_journey() -> None:
         buttons[-1].click().run(timeout=30)
         assert not app.exception
     assert app.session_state["consultations"]["careersim"]["report"] is not None
-    assert any("decision brief is complete" in item.value.lower() for item in app.success)
+    assert any("decision position is complete" in item.value.lower() for item in app.success)
+
+
+def test_consultant_accepts_unknown_in_free_form_conversation() -> None:
+    app = AppTest.from_file(str(Path(__file__).parents[2] / "streamlit_app.py")).run(timeout=30)
+    next(button for button in app.button if button.label == "Start CareerSim").click().run(
+        timeout=30
+    )
+
+    app.chat_input[0].set_value("I don't know yet").run(timeout=30)
+
+    case = app.session_state["consultations"]["careersim"]["case"]
+    assert case.facts[0].status == "unknown"
+    assert case.values == {}
+    visible = "\n".join(item.value for item in (*app.markdown, *app.caption))
+    assert "will not invent" in visible
 
 
 @pytest.mark.parametrize(

@@ -68,7 +68,7 @@ class ModelRegistry:
         }
         if set(item) != required:
             raise ModelRegistryError(f"registry entry keys must be exactly {sorted(required)}")
-        if item["provider"] not in {"ollama", "groq"}:
+        if item["provider"] not in {"ollama", "groq", "browser-webllm"}:
             raise ModelRegistryError("provider is not approved by the Foundation model policy")
         if not item["license"]:
             raise ModelRegistryError("every model requires a documented license")
@@ -97,4 +97,17 @@ class ModelRegistry:
         ]
         if not candidates:
             raise ModelRegistryError(f"no enabled hosted model supports {capability!r}")
+        return max(candidates, key=lambda model: model.context_tokens)
+
+    def resolve_browser(self, capability: str) -> ModelDefinition:
+        """Resolve a provider-free browser profile; capability is checked at runtime."""
+        candidates = [
+            model
+            for model in self._models
+            if model.enabled
+            and model.provider == "browser-webllm"
+            and capability in model.capabilities
+        ]
+        if not candidates:
+            raise ModelRegistryError(f"no enabled browser model supports {capability!r}")
         return max(candidates, key=lambda model: model.context_tokens)

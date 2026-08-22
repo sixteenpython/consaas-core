@@ -10,9 +10,10 @@ The root Streamlit application now contains three bounded, runnable Decision Int
 - **HouseWise** for Indian residential purchase decisions;
 - **StartupEval** for founder and investor venture assessment.
 
-Each journey uses an adaptive expert conversation, a revision-aware session-only Case Knowledge
-Asset, a promoted GKA with explicit decision-metric coverage, a versioned deterministic policy,
-explainable recommendations and optional validated open-model wording. Run it with
+Each journey uses a free-form adaptive expert conversation, an epistemic and revision-aware
+session-only Case Knowledge Asset, a live Decision Position, a promoted GKA with explicit
+decision-metric coverage, a versioned deterministic policy, explainable recommendations and an
+optional provider-free browser model behind a typed validation gate. Run it with
 `streamlit run streamlit_app.py`.
 
 Refresh all three promoted knowledge assets with:
@@ -22,7 +23,8 @@ python refresh_monthly.py --effective-date YYYY-MM-DD
 ```
 
 See [Decision Studio architecture](./docs/DECISION_STUDIO_FOUNDATION.md) and the
-[monthly operations runbook](./docs/DECISION_STUDIO_OPERATIONS.md).
+[monthly operations runbook](./docs/DECISION_STUDIO_OPERATIONS.md). The v0.3 interaction boundary is
+documented in [Conversational Decision Intelligence](./docs/CONVERSATIONAL_DECISION_INTELLIGENCE.md).
 
 ## Product contract
 

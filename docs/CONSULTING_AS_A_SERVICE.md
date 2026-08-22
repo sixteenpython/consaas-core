@@ -1,18 +1,22 @@
-# Consulting as a Service — Decision Studio v0.2
+# Consulting as a Service — Decision Studio v0.3
 
 Status: Implemented for review  
 Effective: 2026-08-23
 
 ## Outcome
 
-Decision Studio now separates four responsibilities:
+Decision Studio separates five responsibilities:
 
 1. the Virtual Domain Consultant conducts an adaptive, plain-language conversation;
 2. the session-only Case Knowledge Asset stores confirmed facts and revisions;
 3. the Grand Knowledge Asset supplies governed domain evidence and a decision-coverage catalog;
 4. the deterministic product engine owns scores, options and verdicts.
+5. an optional provider-free browser model interprets and words turns through a typed validation
+   gate.
 
-The conversation is not canonical memory. Model wording is never authoritative.
+The conversation is not canonical memory. Model wording and proposed actions are never
+authoritative. Free-form conversation, epistemic case states and the live Decision Position are
+specified in [Conversational Decision Intelligence](./CONVERSATIONAL_DECISION_INTELLIGENCE.md).
 
 ## Expert conversation loop
 
@@ -53,4 +57,3 @@ salary or migration outcomes.
 
 Cases remain session-only. Hosted wording remains optional and disclosed. Rollback is a Git revert
 plus restoration of the retained 2026-08-22 GKA pointers; no retained release is rewritten.
-

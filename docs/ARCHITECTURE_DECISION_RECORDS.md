@@ -1,5 +1,14 @@
 # Architecture Decision Records
 
+## Core product decisions
+
+- [ADR-CORE-001](./adrs/core/ADR-CORE-001-DECISION-STUDIO-FOUNDATION.md) launches the bounded
+  three-product Decision Studio.
+- [ADR-CORE-002](./adrs/core/ADR-CORE-002-CONSULTING-AS-A-SERVICE.md) separates expert dialogue,
+  Case Knowledge and deterministic authority.
+- [ADR-CORE-003](./adrs/core/ADR-CORE-003-GOVERNED-BROWSER-CONVERSATION.md) governs free-form and
+  optional provider-free browser conversation.
+
 ADRs are immutable once accepted; later decisions supersede rather than edit history. Each record includes status, context, decision, alternatives, consequences, migration, and validation evidence.
 
 ## Initial decision register

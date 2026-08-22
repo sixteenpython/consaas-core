@@ -2,6 +2,16 @@
   "schema_version": 1,
   "models": [
     {
+      "model_id": "smollm2-1.7b-browser",
+      "runtime_name": "SmolLM2-1.7B-Instruct-q4f16_1-MLC",
+      "provider": "browser-webllm",
+      "license": "Apache-2.0",
+      "capabilities": ["structured_extraction", "conversation"],
+      "minimum_ram_gb": 3,
+      "context_tokens": 4096,
+      "enabled": true
+    },
+    {
       "model_id": "qwen3-8b",
       "runtime_name": "qwen3:8b",
       "provider": "ollama",

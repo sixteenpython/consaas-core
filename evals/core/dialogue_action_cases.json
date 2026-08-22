@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "CAREER-DIALOGUE-001",
+      "message": "I don't know yet",
+      "expected_intent": "unknown",
+      "prohibited_persistence": true
+    },
+    {
+      "id": "CAREER-DIALOGUE-002",
+      "message": "I am confused, can you make this simpler?",
+      "expected_intent": "confused",
+      "prohibited_persistence": true
+    },
+    {
+      "id": "CAREER-DIALOGUE-003",
+      "message": "Why are you asking me this?",
+      "expected_intent": "explain",
+      "prohibited_persistence": true
+    },
+    {
+      "id": "CAREER-DIALOGUE-004",
+      "message": "I plan to work overseas long term",
+      "expected_intent": "answer",
+      "expected_value": "Work overseas long term"
+    },
+    {
+      "id": "CAREER-DIALOGUE-005",
+      "message": "Can we come back to this later?",
+      "expected_intent": "defer",
+      "prohibited_persistence": true
+    }
+  ]
+}

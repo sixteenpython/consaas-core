@@ -10,6 +10,8 @@
 - Provider-neutral local LLM contract, loopback-only Ollama adapter, and licensed model registry
 - Architecture guardrails, unit tests, offline AI evaluation, and GitLab CI definition
 - Dependency-ordered backlog and one end-to-end Narrative implementation demonstration
+- Decision Studio v0.3 free-form consultation, epistemic Case Knowledge, a live Decision Position,
+  and optional provider-free browser inference behind a typed validation gate
 
 ## Deliberate limits
 
@@ -20,5 +22,7 @@
 - Vriddhi has not been rewritten or moved.
 - No Core abstraction is promoted solely from one product.
 - No GitLab pipeline or merge request is claimed: the configured repository currently has only a GitHub remote.
+- Browser inference remains device-dependent and opt-in; the deterministic consultation remains
+  complete when WebGPU or model inference is unavailable.
 
 See `factory/status.json` for machine-readable state and `docs/REMAINING_GAPS.md` for activation work.

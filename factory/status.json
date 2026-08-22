@@ -30,7 +30,8 @@
     "NARRATIVE-002-T01": {"status": "ready", "tests": 0, "evaluation_cases": 0},
     "NARRATIVE-004-T01": {"status": "review", "tests": 15, "evaluation_cases": 0},
     "CORE-001-T01": {"status": "review", "tests": 9, "evaluation_cases": 3},
-    "CORE-002-T01": {"status": "review", "tests": 11, "evaluation_cases": 4}
+    "CORE-002-T01": {"status": "review", "tests": 11, "evaluation_cases": 4},
+    "CORE-003-T01": {"status": "review", "tests": 13, "evaluation_cases": 5}
   },
   "blockers": ["authoritative GitLab remote and runner are not configured"],
   "milestones": [
@@ -38,7 +39,8 @@
     {"id": "narrative-foundation-alpha", "status": "review"},
     {"id": "narrative-vertical-slice-1", "status": "not-started"},
     {"id": "decision-studio-foundation", "status": "review"},
-    {"id": "consulting-as-a-service", "status": "review"}
+    {"id": "consulting-as-a-service", "status": "review"},
+    {"id": "conversational-decision-intelligence", "status": "review"}
   ],
   "next_ready_task": "NARRATIVE-002-T01"
 }

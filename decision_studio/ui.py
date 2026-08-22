@@ -11,9 +11,8 @@ from typing import Any, cast
 import streamlit as st
 
 from core.ai.adapters.groq import GroqProvider
-from core.ai.adapters.ollama import OllamaProvider
-from core.ai.contracts import LLMProvider
 from core.ai.registry import ModelRegistry
+from decision_studio.browser_expert import browser_expert
 from decision_studio.case import CaseKnowledgeAsset
 from decision_studio.catalog import (
     PRODUCTS,
@@ -21,12 +20,18 @@ from decision_studio.catalog import (
     load_metric_catalog,
     load_skill,
 )
-from decision_studio.consultant import deterministic_turn, model_turn
+from decision_studio.conversation import (
+    DialogueAction,
+    apply_action,
+    browser_prompt,
+    deterministic_action,
+    validate_model_action,
+)
 from decision_studio.narrator import ConsultantNarrative, narrate
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0"
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -78,6 +83,7 @@ def _init() -> None:
         "selected_product": None,
         "consultations": {},
         "narratives": {},
+        "browser_expert_enabled": {},
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -143,13 +149,13 @@ def _landing() -> None:
         (
             "Canonical memory",
             "Deterministic verdict",
-            "Model-assisted explanation",
+            "Provider-free conversation",
             "Evidence trail",
         ),
         (
             "The structured brief—not chat history—is the source of truth.",
             "Rules, constraints and scores are replayable and versioned.",
-            "An open-weight model may explain; it cannot rewrite the decision.",
+            "An optional browser model makes dialogue natural without owning the decision.",
             "Every result identifies asset, policy, assumptions and limitations.",
         ),
         strict=True,
@@ -171,6 +177,7 @@ def _consultation(product_id: str) -> dict[str, Any]:
             "case": CaseKnowledgeAsset(product_id),
             "messages": [],
             "report": None,
+            "pending_turn": None,
         }
     return cast(dict[str, Any], consultations[product_id])
 
@@ -236,130 +243,228 @@ def _display_rows(values: dict[str, Any]) -> list[dict[str, str]]:
     ]
 
 
-def _render_consultant(product_id: str, service: DecisionStudio) -> None:
-    state = _consultation(product_id)
-    case: CaseKnowledgeAsset = state["case"]
-    answers = case.values
-    questions = service.questions(product_id)
-    answered = len(answers)
-    expert_runtime = _expert_runtime()
-    use_model = st.toggle(
-        "Open-model expert wording",
-        value=False,
-        key=f"expert-model-{product_id}",
-        disabled=expert_runtime is None,
-        help=(
-            "Uses a configured Apache-2.0 open-weight model only for conversational wording. "
-            "Confirmed facts and deterministic decisions remain governed by the application."
-        ),
+def _complete_dialogue_action(
+    product_id: str,
+    service: DecisionStudio,
+    state: dict[str, Any],
+    action: DialogueAction,
+) -> None:
+    state["case"] = apply_action(state["case"], action)
+    state["messages"].append(
+        {
+            "role": "assistant",
+            "content": f"{action.acknowledgement}\n\n{action.guidance}",
+            "model_id": action.model_id,
+        }
     )
-    if expert_runtime and expert_runtime[2]:
-        st.caption(
-            "Optional hosted open-weight wording is available. Turning it on sends this "
-            "anonymous consultation externally; it cannot alter the Case Knowledge Asset."
-        )
-    elif expert_runtime:
-        st.caption(
-            "Private local open-model wording is available through Ollama. Model text cannot "
-            "alter confirmed facts, scores or verdicts."
-        )
+    if len(state["case"].values) == len(service.questions(product_id)):
+        state["report"] = service.decide(product_id, state["case"].values)
     else:
-        st.caption(
-            "Governed expert conversation is active. A local Ollama or configured open-weight "
-            "runtime can enhance wording without changing the decision."
-        )
-    st.progress(
-        answered / len(questions), text=f"Decision brief: {answered}/{len(questions)} established"
+        state["report"] = None
+    state["pending_turn"] = None
+
+
+def _render_decision_position(
+    case: CaseKnowledgeAsset,
+    questions: tuple[Question, ...],
+    next_question: Question | None,
+) -> None:
+    question_map = {question.question_id: question for question in questions}
+    st.markdown('<div class="cs-section">Live decision position</div>', unsafe_allow_html=True)
+    established = len(case.values)
+    st.metric("Analysis depth", f"{established}/{len(questions)}")
+    if next_question:
+        st.markdown("**Next analytical issue**")
+        st.write(next_question.prompt)
+    if case.facts:
+        st.markdown("**What I understand**")
+        for fact in case.facts:
+            label = _display_label(fact.question_id)
+            if fact.status in {"confirmed", "estimated"}:
+                value = _display_value(fact.question_id, fact.value)
+                st.caption(f"✓ {label}: {value} · {fact.status}")
+            else:
+                st.caption(f"○ {label}: {fact.status}")
+    else:
+        st.caption("No canonical facts yet. Start by describing the decision in your own words.")
+    if case.unresolved_ids:
+        st.markdown("**Visible uncertainty**")
+        for question_id in case.unresolved_ids:
+            st.caption(f"• {question_map[question_id].prompt}")
+    st.markdown("**Authority boundary**")
+    st.caption(
+        "Conversation may interpret and challenge. Only validated facts enter the case; the "
+        "versioned product engine owns every score and verdict."
     )
-    if not state["messages"]:
-        with st.chat_message("assistant"):
-            st.write(
-                "Let’s work through the decision together. I’ll explain why each issue matters, "
-                "adapt the conversation as your situation becomes clearer, and preserve confirmed "
-                "facts in a Case Knowledge Asset. I will not force a verdict when evidence is thin."
-            )
-    for message in state["messages"]:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-    if answered < len(questions):
-        question = service.next_question(product_id, answers)
-        if question is None:
-            raise RuntimeError("consultation has unresolved coverage but no next question")
-        with st.chat_message("assistant"):
-            st.markdown(f"**{question.prompt}**")
-            st.caption(f"Why this matters: {question.why_it_matters}")
+
+
+def _render_guided_answer(
+    product_id: str,
+    service: DecisionStudio,
+    state: dict[str, Any],
+    question: Question,
+) -> None:
+    with st.expander("Prefer a guided answer?"):
         with st.form(f"question-{product_id}-{question.question_id}"):
             answer = _answer_widget(question)
             submitted = st.form_submit_button(
                 "Preserve answer and continue", type="primary", width="stretch"
             )
         if submitted:
-            updated_case = case.confirm(question.question_id, answer)
-            state["case"] = updated_case
             shown = (
-                _format_inr(float(answer))
-                if question.question_id.endswith("_inr")
-                else str(answer)
+                _format_inr(float(answer)) if question.question_id.endswith("_inr") else str(answer)
             )
-            turn = deterministic_turn(question, shown)
-            if use_model and expert_runtime:
+            state["messages"].append({"role": "user", "content": shown})
+            action = DialogueAction(
+                "answer",
+                question.question_id,
+                answer,
+                "I’ve captured that as a confirmed part of your case.",
+                question.expert_context or question.why_it_matters,
+            )
+            _complete_dialogue_action(product_id, service, state, action)
+            st.rerun()
+
+
+def _render_consultant(product_id: str, service: DecisionStudio) -> None:
+    state = _consultation(product_id)
+    case: CaseKnowledgeAsset = state["case"]
+    answers = case.values
+    questions = service.questions(product_id)
+    answered = len(answers)
+    next_question = service.next_question(product_id, answers, case.unresolved_ids)
+    use_browser = st.toggle(
+        "Private browser conversation",
+        value=st.session_state.browser_expert_enabled.get(product_id, False),
+        key=f"browser-model-{product_id}",
+        help=(
+            "Optional Apache-2.0 open-weight model inference runs on this device through WebGPU. "
+            "No provider key is used and every proposed action is validated by the application."
+        ),
+    )
+    st.session_state.browser_expert_enabled[product_id] = use_browser
+    st.progress(
+        answered / len(questions), text=f"Decision brief: {answered}/{len(questions)} established"
+    )
+    conversation, position = st.columns([1.8, 1], gap="large")
+    with position, st.container(border=True):
+        _render_decision_position(case, questions, next_question)
+    with conversation:
+        if not state["messages"]:
+            with st.chat_message("assistant"):
+                st.write(
+                    "Tell me what decision you are facing in your own words. You do not need to "
+                    "have every answer: you can say ‘I don’t know’, ask why something matters, or "
+                    "change your mind. I’ll build the decision position with you without inventing "
+                    "missing facts."
+                )
+        for message in state["messages"]:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+                if message.get("model_id"):
+                    st.caption(f"Private browser wording · {message['model_id']}")
+
+        pending = state.get("pending_turn")
+        if use_browser:
+            registry = ModelRegistry.from_file(ROOT / "factory" / "model_registry.json")
+            model = registry.resolve_browser("conversation")
+            request = None
+            if pending:
+                request = {
+                    "request_id": pending["request_id"],
+                    "payload": pending["payload"],
+                }
+            component = browser_expert(
+                model_id=model.runtime_name,
+                request=request,
+                key=f"browser-expert-{product_id}",
+            )
+            returned = getattr(component, "turn", None)
+            if pending and returned and returned.get("request_id") == pending["request_id"]:
                 try:
-                    turn = model_turn(
-                        question,
-                        shown,
-                        updated_case.values,
-                        load_skill(ROOT, product_id),
-                        expert_runtime[0],
-                        expert_runtime[1],
-                    )
-                except (ValueError, RuntimeError, json.JSONDecodeError):
-                    turn = deterministic_turn(question, shown)
-            state["messages"].extend(
-                [
-                    {"role": "user", "content": shown},
-                    {
-                        "role": "assistant",
-                        "content": f"{turn.acknowledgement}\n\n{turn.implication}",
-                    },
-                ]
+                    raw = json.loads(returned["raw"])
+                    action = validate_model_action(raw, pending["question"], returned["model_id"])
+                except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+                    action = deterministic_action(pending["text"], pending["question"])
+                _complete_dialogue_action(product_id, service, state, action)
+                st.rerun()
+            if pending and st.button(
+                "Continue now with governed fallback",
+                key=f"fallback-{product_id}-{pending['request_id']}",
+                width="stretch",
+            ):
+                action = deterministic_action(pending["text"], pending["question"])
+                _complete_dialogue_action(product_id, service, state, action)
+                st.rerun()
+        elif pending:
+            action = deterministic_action(pending["text"], pending["question"])
+            _complete_dialogue_action(product_id, service, state, action)
+            st.rerun()
+
+        if next_question:
+            with st.chat_message("assistant"):
+                st.markdown(f"**{next_question.prompt}**")
+                st.caption(f"Why this matters: {next_question.why_it_matters}")
+            _render_guided_answer(product_id, service, state, next_question)
+            user_text = st.chat_input(
+                "Answer naturally, ask why, or say ‘I don’t know’…",
+                key=f"consultant-chat-{product_id}",
             )
-            if len(updated_case.values) == len(questions):
-                state["report"] = service.decide(product_id, updated_case.values)
-            st.rerun()
-    else:
-        st.success("Your decision brief is complete. The deterministic assessment is ready.")
-        if st.button("Rebuild assessment", width="stretch"):
-            state["report"] = service.decide(product_id, answers)
-            st.rerun()
+            if user_text:
+                state["messages"].append({"role": "user", "content": user_text})
+                request_id = f"{product_id}-{len(state['messages'])}"
+                state["pending_turn"] = {
+                    "request_id": request_id,
+                    "text": user_text,
+                    "question": next_question,
+                    "payload": browser_prompt(user_text, next_question, case),
+                }
+                st.rerun()
+        elif answered == len(questions):
+            st.success("Your decision position is complete. The governed assessment is ready.")
+            if st.button("Rebuild assessment", width="stretch"):
+                state["report"] = service.decide(product_id, answers)
+                st.rerun()
+        else:
+            st.warning(
+                "We have covered every issue, but some material facts remain unknown or deferred. "
+                "The application will not manufacture a verdict. Resolve them in the Decision "
+                "Brief when evidence becomes available."
+            )
 
 
 def _render_brief(product_id: str, service: DecisionStudio) -> None:
     state = _consultation(product_id)
     case: CaseKnowledgeAsset = state["case"]
-    answers = case.values
     questions = {question.question_id: question for question in service.questions(product_id)}
     st.subheader("Canonical Case Knowledge Asset")
     st.caption(
         "Confirmed facts—not the conversational transcript—are evaluated. Every revision is "
         "preserved for this anonymous session."
     )
-    if not answers:
-        st.info("Answer the first consultant question to begin the brief.")
+    if not case.facts:
+        st.info("Begin the consultant conversation to create the brief.")
         return
-    for key, value in answers.items():
+    for fact in case.facts:
+        key = fact.question_id
+        value = fact.value
         with st.container(border=True):
             st.markdown(
                 f'<div class="cs-section">{questions[key].prompt}</div>', unsafe_allow_html=True
             )
-            if key.endswith("_inr"):
+            if fact.status not in {"confirmed", "estimated"}:
+                st.markdown(f"**{fact.status.replace('_', ' ').title()}**")
+                st.caption("No value is assumed by the Decision Engine.")
+            elif key.endswith("_inr"):
                 st.markdown(f"**{_format_inr(float(value))}**")
+                st.caption(f"{fact.status.title()} · source: {fact.source}")
             else:
                 st.markdown(f"**{value}**")
-            st.caption("Confirmed · source: user")
-    with st.expander("Revise a confirmed fact"):
+                st.caption(f"{fact.status.title()} · source: {fact.source}")
+    with st.expander("Resolve or revise a case fact"):
         revision_key = st.selectbox(
             "Fact to revise",
-            tuple(answers),
+            tuple(case.fact_map),
             format_func=lambda key: questions[key].prompt,
             key=f"revision-field-{product_id}",
         )
@@ -381,6 +486,7 @@ def _render_brief(product_id: str, service: DecisionStudio) -> None:
                         "Fact": _display_label(item.question_id),
                         "Previous": _display_value(item.question_id, item.previous_value),
                         "Current": _display_value(item.question_id, item.new_value),
+                        "Status": f"{item.previous_status} → {item.new_status}",
                     }
                     for item in case.revisions
                 ],
@@ -392,6 +498,7 @@ def _render_brief(product_id: str, service: DecisionStudio) -> None:
             "case": case.reset(),
             "messages": [],
             "report": None,
+            "pending_turn": None,
         }
         st.session_state.narratives.pop(product_id, None)
         st.rerun()
@@ -407,9 +514,7 @@ def _render_option(option: Any, rank: int) -> None:
             st.markdown(f"- {reason}")
         if option.metrics:
             with st.expander("Numbers behind this option"):
-                st.dataframe(
-                    _display_rows(option.metrics), width="stretch", hide_index=True
-                )
+                st.dataframe(_display_rows(option.metrics), width="stretch", hide_index=True)
         with st.expander("Risks and evidence"):
             st.markdown("**Risks**")
             for risk in option.risks:
@@ -427,19 +532,6 @@ def _secret(name: str) -> str | None:
         return str(st.secrets[name]) if name in st.secrets else None
     except Exception:
         return None
-
-
-def _expert_runtime() -> tuple[LLMProvider, str, bool] | None:
-    """Resolve optional local-first expert wording without coupling product logic."""
-    local_model = os.getenv("CONSAAS_OLLAMA_MODEL")
-    if local_model:
-        return OllamaProvider(), local_model, False
-    key = _secret("GROQ_API_KEY")
-    if key:
-        registry = ModelRegistry.from_file(ROOT / "factory" / "model_registry.json")
-        model = registry.resolve_hosted("conversation")
-        return GroqProvider(key), model.runtime_name, True
-    return None
 
 
 def _render_narrative(product_id: str, report: DecisionReport) -> None:

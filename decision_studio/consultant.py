@@ -19,10 +19,17 @@ class ExpertTurn:
 
 
 def select_next_question(
-    product_id: str, questions: tuple[Question, ...], answers: dict[str, Any]
+    product_id: str,
+    questions: tuple[Question, ...],
+    answers: dict[str, Any],
+    excluded_ids: frozenset[str] = frozenset(),
 ) -> Question | None:
     """Choose the unresolved question with greatest current decision value."""
-    unanswered = [question for question in questions if question.question_id not in answers]
+    unanswered = [
+        question
+        for question in questions
+        if question.question_id not in answers and question.question_id not in excluded_ids
+    ]
     if not unanswered:
         return None
 
