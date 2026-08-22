@@ -54,3 +54,4 @@ Narrative Architect decisions are maintained separately so domain constraints do
 8. [ADR-NA-008: Immutable revision graph](./adrs/narrative/ADR-NA-008-IMMUTABLE-REVISION-GRAPH.md)
 9. [ADR-NA-009: Hierarchical screenplay analysis](./adrs/narrative/ADR-NA-009-HIERARCHICAL-SCREENPLAY-ANALYSIS.md)
 10. [ADR-NA-010: SDI extension boundary](./adrs/narrative/ADR-NA-010-SDI-EXTENSION-BOUNDARY.md)
+11. [ADR-NA-011: Hosted Foundation Alpha and local-private profile](./adrs/narrative/ADR-NA-011-HOSTED-FOUNDATION-ALPHA.md)

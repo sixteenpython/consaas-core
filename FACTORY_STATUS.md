@@ -13,11 +13,12 @@
 
 ## Deliberate limits
 
-- Narrative Architect is not built beyond the small validated-statement slice.
+- Narrative Architect now has a deployable deterministic Foundation Alpha for Create mode. It is
+  deliberately smaller than Vertical Slice 1: local LLM proposals, durable SQLite storage,
+  screenplay PDF output, full NKA v1, and Doctor mode remain unbuilt.
 - HouseWise and CareerSim remain product envelopes, not applications.
 - Vriddhi has not been rewritten or moved.
 - No Core abstraction is promoted solely from one product.
 - No GitLab pipeline or merge request is claimed: the configured repository currently has only a GitHub remote.
 
 See `factory/status.json` for machine-readable state and `docs/REMAINING_GAPS.md` for activation work.
-

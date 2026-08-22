@@ -4,6 +4,15 @@
 
 A single-user local application can develop a screenplay through expert conversation, maintain a coherent canonical NKA, compile a standard/bounded screenplay, import a born-digital PDF, diagnose it under SDI, and converse with evidence-linked findings.
 
+## Foundation Alpha release boundary
+
+The first public deployment is an architectural proving slice, not the full MVP described below. It
+supports deterministic guided story development, a minimum NKA, character and scene editing,
+immutable in-session revisions, portable JSON, and bounded Fountain compilation. It intentionally
+excludes local LLM inference, durable server storage, PDF parsing, SDI/iMaSc diagnosis, and Doctor
+mode. Hosted users are warned not to enter confidential screenplay material; the local profile is the
+privacy-preserving path.
+
 ## Vertical Slice 1 — Create
 
 **End-to-end:** create local project -> narrate idea -> expert asks/proposes -> structured NKA revisions -> inspect scenes/characters/plot -> revise/undo -> compiler readiness -> compile/download screenplay.

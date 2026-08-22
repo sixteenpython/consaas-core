@@ -2,6 +2,12 @@
 
 Each increment begins by rereading its architecture documents and ends with implementation, tests, validation, diff review, documentation update, and a runnable application.
 
+## Current proving release
+
+Foundation Alpha v0.1.0 combines a deliberately narrow subset of Increments 1, 3, and 4 to validate
+the user loop on a public Streamlit deployment without a model or secret. It does not mark those
+increments complete. The production roadmap below remains authoritative.
+
 ## Increment 0 — Architecture approval
 
 Approve Phase-1 documents, resolve open SDI scale/cadence labels, accept/revise ADRs, select supported MVP hardware profiles, and approve local-model/license candidates. No code.

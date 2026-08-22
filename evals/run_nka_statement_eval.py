@@ -3,9 +3,14 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
-from narrative_architect.knowledge.statements import (
+NARRATIVE_SOURCE = Path(__file__).resolve().parents[1] / "narrative" / "src"
+if str(NARRATIVE_SOURCE) not in sys.path:
+    sys.path.insert(0, str(NARRATIVE_SOURCE))
+
+from narrative_architect.knowledge.statements import (  # noqa: E402
     StatementValidationError,
     validate_model_statement,
 )

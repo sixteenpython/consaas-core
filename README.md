@@ -21,7 +21,7 @@ Every stage consumes and emits a versioned artifact envelope. A release is promo
 
 ## Factory status
 
-The repository now contains the first controlled factory bootstrap: governance, scoped agent contracts, Feature Creator, task/backlog conventions, product templates, local-AI contracts, a model registry, architecture guardrails, tests, offline evaluations, and a GitLab CI definition. Vriddhi remains the production reference product; Narrative Architect contains only one deliberately small validation slice.
+The repository now contains the first controlled factory bootstrap: governance, scoped agent contracts, Feature Creator, task/backlog conventions, product templates, local-AI contracts, a model registry, architecture guardrails, tests, offline evaluations, and a GitLab CI definition. Vriddhi remains the production reference product; Narrative Architect now includes a deliberately bounded, deterministic Foundation Alpha for Create mode.
 
 See [FACTORY_STATUS.md](./FACTORY_STATUS.md). Items remain in `REVIEW` until human review and a real GitLab pipeline are available; the configured remote is currently GitHub, so this repository does not claim a GitLab merge request has run.
 
