@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-08-22",
+  "as_of": "2026-08-23",
   "bootstrap": "review",
   "source_control": {
     "configured_remote": "github",
@@ -29,14 +29,16 @@
     "NARRATIVE-001-T01": {"status": "review", "tests": 7, "evaluation_cases": 3},
     "NARRATIVE-002-T01": {"status": "ready", "tests": 0, "evaluation_cases": 0},
     "NARRATIVE-004-T01": {"status": "review", "tests": 15, "evaluation_cases": 0},
-    "CORE-001-T01": {"status": "review", "tests": 9, "evaluation_cases": 3}
+    "CORE-001-T01": {"status": "review", "tests": 9, "evaluation_cases": 3},
+    "CORE-002-T01": {"status": "review", "tests": 11, "evaluation_cases": 4}
   },
   "blockers": ["authoritative GitLab remote and runner are not configured"],
   "milestones": [
     {"id": "factory-bootstrap", "status": "review"},
     {"id": "narrative-foundation-alpha", "status": "review"},
     {"id": "narrative-vertical-slice-1", "status": "not-started"},
-    {"id": "decision-studio-foundation", "status": "review"}
+    {"id": "decision-studio-foundation", "status": "review"},
+    {"id": "consulting-as-a-service", "status": "review"}
   ],
   "next_ready_task": "NARRATIVE-002-T01"
 }

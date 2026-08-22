@@ -1,0 +1,183 @@
+{
+  "schema_version": "0.2.0",
+  "product_id": "housewise",
+  "decision": "Risk-adjusted Indian residential property purchase",
+  "metrics": [
+    {
+      "metric_id": "rera_status",
+      "label": "RERA registration and filing status",
+      "decision_use": "Project eligibility and transparency gate",
+      "coverage": "planned_connector",
+      "freshness": "quarterly",
+      "preferred_source": "State RERA"
+    },
+    {
+      "metric_id": "title_encumbrance",
+      "label": "Title and encumbrance evidence",
+      "decision_use": "Legal veto",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Legal diligence"
+    },
+    {
+      "metric_id": "project_approvals",
+      "label": "Planning and completion approvals",
+      "decision_use": "Execution and occupancy gate",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Local authority / RERA"
+    },
+    {
+      "metric_id": "promoter_delivery",
+      "label": "Promoter delivery history",
+      "decision_use": "Execution-risk assessment",
+      "coverage": "planned_connector",
+      "freshness": "quarterly",
+      "preferred_source": "State RERA"
+    },
+    {
+      "metric_id": "carpet_area",
+      "label": "Carpet area",
+      "decision_use": "Comparable usable-price calculation",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "RERA filing / agreement"
+    },
+    {
+      "metric_id": "transaction_price",
+      "label": "Registered transaction price",
+      "decision_use": "Valuation anchor",
+      "coverage": "planned_connector",
+      "freshness": "quarterly",
+      "preferred_source": "Registration authority"
+    },
+    {
+      "metric_id": "asking_price",
+      "label": "Current asking price",
+      "decision_use": "Negotiation context",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Seller / broker"
+    },
+    {
+      "metric_id": "acquisition_cost",
+      "label": "All-in acquisition cost",
+      "decision_use": "Affordability gate",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Calculated from case"
+    },
+    {
+      "metric_id": "recurring_cost",
+      "label": "Maintenance and ownership cost",
+      "decision_use": "True holding cost",
+      "coverage": "required_case_evidence",
+      "freshness": "annual",
+      "preferred_source": "Society / owner"
+    },
+    {
+      "metric_id": "rental_yield",
+      "label": "Gross and net rental yield",
+      "decision_use": "Income-return assessment",
+      "coverage": "available",
+      "freshness": "quarterly",
+      "preferred_source": "Market evidence"
+    },
+    {
+      "metric_id": "vacancy",
+      "label": "Vacancy reference",
+      "decision_use": "Income-risk assessment",
+      "coverage": "planned_connector",
+      "freshness": "quarterly",
+      "preferred_source": "Market evidence"
+    },
+    {
+      "metric_id": "price_trend",
+      "label": "House-price trend",
+      "decision_use": "Market-cycle context",
+      "coverage": "available",
+      "freshness": "quarterly",
+      "preferred_source": "RBI HPI / NHB RESIDEX"
+    },
+    {
+      "metric_id": "liquidity",
+      "label": "Resale liquidity",
+      "decision_use": "Exit-risk assessment",
+      "coverage": "available",
+      "freshness": "quarterly",
+      "preferred_source": "Transaction and inventory evidence"
+    },
+    {
+      "metric_id": "supply_absorption",
+      "label": "Supply and absorption",
+      "decision_use": "Oversupply and appreciation risk",
+      "coverage": "planned_connector",
+      "freshness": "quarterly",
+      "preferred_source": "RERA / market evidence"
+    },
+    {
+      "metric_id": "loan_stress",
+      "label": "Rate and EMI stress",
+      "decision_use": "Household-resilience veto",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Lender and case"
+    },
+    {
+      "metric_id": "transit_access",
+      "label": "Transit and commute access",
+      "decision_use": "Liveability and demand durability",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Public transport authority"
+    },
+    {
+      "metric_id": "services_access",
+      "label": "Schools, healthcare and daily services",
+      "decision_use": "Liveability assessment",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Public geospatial sources"
+    },
+    {
+      "metric_id": "climate_water",
+      "label": "Flood, heat and water exposure",
+      "decision_use": "Site-risk veto",
+      "coverage": "required_case_evidence",
+      "freshness": "seasonal",
+      "preferred_source": "Government and site diligence"
+    },
+    {
+      "metric_id": "air_quality",
+      "label": "Air-quality exposure",
+      "decision_use": "Long-term liveability",
+      "coverage": "planned_connector",
+      "freshness": "monthly",
+      "preferred_source": "CPCB"
+    },
+    {
+      "metric_id": "complaints_enforcement",
+      "label": "Complaints and enforcement actions",
+      "decision_use": "Promoter/project risk",
+      "coverage": "planned_connector",
+      "freshness": "quarterly",
+      "preferred_source": "State RERA"
+    },
+    {
+      "metric_id": "downside_value",
+      "label": "Rate, delay and resale downside",
+      "decision_use": "Capital-at-risk scenario",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Deterministic engine"
+    },
+    {
+      "metric_id": "source_quality",
+      "label": "Evidence quality and freshness",
+      "decision_use": "Recommendation authority",
+      "coverage": "available",
+      "freshness": "each refresh",
+      "preferred_source": "ConSaaS provenance"
+    }
+  ]
+}

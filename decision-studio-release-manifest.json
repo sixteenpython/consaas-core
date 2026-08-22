@@ -1,15 +1,15 @@
 {
-  "release": "decision-studio-foundation-0.1.1",
-  "date": "2026-08-22",
+  "release": "decision-studio-consulting-0.2.0",
+  "date": "2026-08-23",
   "entrypoint": "streamlit_app.py",
   "products": ["careersim", "housewise", "startup"],
-  "gka_schema": "0.1.0",
-  "policy_version": "0.1.0",
+  "gka_schema": "product-versioned with decision metric catalogs",
+  "policy_version": "product-versioned; CareerSim 0.2.0",
   "profile": "anonymous-session-only",
   "external_inference_required": false,
   "hosted_narration": "optional-explicit-consent",
   "limitations": [
-    "Foundation seed coverage is intentionally small",
+    "Available observations remain illustrative and are not exhaustive",
     "Reference-only official sources require operator review",
     "No output is financial, legal, admission, valuation or investment advice"
   ],

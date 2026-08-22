@@ -1,0 +1,183 @@
+{
+  "schema_version": "0.2.0",
+  "product_id": "startup",
+  "decision": "Stage-adjusted startup evidence and next capital decision",
+  "metrics": [
+    {
+      "metric_id": "entity_status",
+      "label": "Entity and DPIIT status",
+      "decision_use": "Identity and eligibility context",
+      "coverage": "planned_connector",
+      "freshness": "monthly",
+      "preferred_source": "MCA / Startup India"
+    },
+    {
+      "metric_id": "stage",
+      "label": "Venture stage",
+      "decision_use": "Select appropriate evidence standard",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Case Knowledge Asset"
+    },
+    {
+      "metric_id": "founder_commitment",
+      "label": "Founder capability and commitment",
+      "decision_use": "Execution-risk assessment",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Founder evidence"
+    },
+    {
+      "metric_id": "team_coverage",
+      "label": "Critical team coverage",
+      "decision_use": "Execution bottleneck assessment",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Case Knowledge Asset"
+    },
+    {
+      "metric_id": "revenue_quality",
+      "label": "Recurring or repeatable revenue",
+      "decision_use": "Commercial-evidence strength",
+      "coverage": "available",
+      "freshness": "monthly",
+      "preferred_source": "Management accounts"
+    },
+    {
+      "metric_id": "growth",
+      "label": "Revenue or active-customer growth",
+      "decision_use": "Momentum assessment",
+      "coverage": "available",
+      "freshness": "monthly",
+      "preferred_source": "Management accounts"
+    },
+    {
+      "metric_id": "retention",
+      "label": "Cohort retention and churn",
+      "decision_use": "Persistence of customer value",
+      "coverage": "available",
+      "freshness": "monthly",
+      "preferred_source": "Product / billing data"
+    },
+    {
+      "metric_id": "gross_margin",
+      "label": "Gross margin",
+      "decision_use": "Delivery-economic viability",
+      "coverage": "available",
+      "freshness": "monthly",
+      "preferred_source": "Management accounts"
+    },
+    {
+      "metric_id": "contribution_margin",
+      "label": "Contribution margin",
+      "decision_use": "Scalable unit economics",
+      "coverage": "required_case_evidence",
+      "freshness": "monthly",
+      "preferred_source": "Management accounts"
+    },
+    {
+      "metric_id": "cac",
+      "label": "Customer acquisition cost",
+      "decision_use": "Acquisition efficiency",
+      "coverage": "required_case_evidence",
+      "freshness": "monthly",
+      "preferred_source": "Sales and marketing data"
+    },
+    {
+      "metric_id": "ltv",
+      "label": "Customer lifetime value",
+      "decision_use": "Value-to-acquisition comparison",
+      "coverage": "required_case_evidence",
+      "freshness": "quarterly",
+      "preferred_source": "Cohort data"
+    },
+    {
+      "metric_id": "payback",
+      "label": "CAC payback period",
+      "decision_use": "Capital-efficiency assessment",
+      "coverage": "required_case_evidence",
+      "freshness": "monthly",
+      "preferred_source": "Calculated from case"
+    },
+    {
+      "metric_id": "burn",
+      "label": "Net monthly burn",
+      "decision_use": "Capital consumption",
+      "coverage": "required_case_evidence",
+      "freshness": "monthly",
+      "preferred_source": "Cash flow"
+    },
+    {
+      "metric_id": "runway",
+      "label": "Cash runway",
+      "decision_use": "Survival gate",
+      "coverage": "available",
+      "freshness": "monthly",
+      "preferred_source": "Cash flow"
+    },
+    {
+      "metric_id": "concentration",
+      "label": "Customer concentration",
+      "decision_use": "Revenue fragility",
+      "coverage": "required_case_evidence",
+      "freshness": "monthly",
+      "preferred_source": "Billing data"
+    },
+    {
+      "metric_id": "pipeline",
+      "label": "Pipeline conversion and cycle",
+      "decision_use": "Forward revenue quality",
+      "coverage": "required_case_evidence",
+      "freshness": "monthly",
+      "preferred_source": "CRM"
+    },
+    {
+      "metric_id": "market_evidence",
+      "label": "Bottom-up market evidence",
+      "decision_use": "Scale plausibility",
+      "coverage": "required_case_evidence",
+      "freshness": "quarterly",
+      "preferred_source": "Customer and market research"
+    },
+    {
+      "metric_id": "competitive_moat",
+      "label": "Differentiation and defensibility",
+      "decision_use": "Long-term value capture",
+      "coverage": "required_case_evidence",
+      "freshness": "quarterly",
+      "preferred_source": "Product and market evidence"
+    },
+    {
+      "metric_id": "regulatory_path",
+      "label": "Regulatory and compliance path",
+      "decision_use": "Permission-to-operate gate",
+      "coverage": "available",
+      "freshness": "policy change",
+      "preferred_source": "Regulator / counsel"
+    },
+    {
+      "metric_id": "cap_table",
+      "label": "Cap table and governance",
+      "decision_use": "Funding and control risk",
+      "coverage": "required_case_evidence",
+      "freshness": "financing event",
+      "preferred_source": "Company records"
+    },
+    {
+      "metric_id": "scenario_capital",
+      "label": "Capital needed to next evidence milestone",
+      "decision_use": "Funding prescription",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Deterministic engine"
+    },
+    {
+      "metric_id": "source_quality",
+      "label": "Evidence quality and freshness",
+      "decision_use": "Recommendation authority",
+      "coverage": "available",
+      "freshness": "each refresh",
+      "preferred_source": "ConSaaS provenance"
+    }
+  ]
+}

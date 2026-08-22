@@ -1,8 +1,12 @@
 {
-  "schema_version": 1,
-  "sources": [
-    {"source_id": "careersim_foundation_curated", "publisher": "ConSaaS", "mode": "curated_snapshot", "url": "careersim/data/seed.csv", "license": "project-authored synthesis", "cadence": "monthly review"},
-    {"source_id": "nirf_2025", "publisher": "Ministry of Education, Government of India", "mode": "reference_only", "url": "https://www.nirfindia.org/Rankings/2025/Ranking.html", "license": "official public information; verify reuse terms", "cadence": "annual"},
-    {"source_id": "aishe_2023_24", "publisher": "Ministry of Education, Government of India", "mode": "reference_only", "url": "https://aishe.gov.in/documents/", "license": "official public information; verify reuse terms", "cadence": "annual"}
+  "schema_version":2,
+  "sources":[
+    {"source_id":"careersim_overseas_archetypes","publisher":"ConSaaS","mode":"curated_snapshot","url":"careersim/data/seed.csv","license":"project-authored illustrative synthesis","cadence":"monthly review"},
+    {"source_id":"educationusa","publisher":"U.S. Department of State","mode":"reference_only","url":"https://educationusa.state.gov/","license":"official public information; verify reuse terms","cadence":"monthly review"},
+    {"source_id":"canada_ircc","publisher":"Government of Canada","mode":"reference_only","url":"https://www.canada.ca/en/services/immigration-citizenship.html","license":"official public information; verify reuse terms","cadence":"monthly review"},
+    {"source_id":"uk_visas","publisher":"Government of the United Kingdom","mode":"reference_only","url":"https://www.gov.uk/student-visa","license":"official public information; verify reuse terms","cadence":"monthly review"},
+    {"source_id":"eu_study","publisher":"European Commission","mode":"reference_only","url":"https://education.ec.europa.eu/study-in-europe","license":"official public information; verify reuse terms","cadence":"monthly review"},
+    {"source_id":"australia_home_affairs","publisher":"Australian Government","mode":"reference_only","url":"https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500","license":"official public information; verify reuse terms","cadence":"monthly review"},
+    {"source_id":"rbi_fx","publisher":"Reserve Bank of India","mode":"reference_only","url":"https://data.rbi.org.in/","license":"official public information; verify reuse terms","cadence":"monthly"}
   ]
 }

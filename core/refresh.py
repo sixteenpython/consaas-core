@@ -60,12 +60,34 @@ def _validate_rows(rows: list[dict[str, str]], schema: dict[str, Any]) -> list[d
     return issues
 
 
+def _validate_metric_catalog(catalog: dict[str, Any]) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    metrics = catalog.get("metrics")
+    if not isinstance(metrics, list) or not metrics:
+        return [{"severity": "error", "row": 0, "message": "metric catalog is empty"}]
+    required = {"metric_id", "label", "decision_use", "coverage", "freshness", "preferred_source"}
+    allowed_coverage = {"available", "planned_connector", "required_case_evidence"}
+    identifiers: set[str] = set()
+    for index, metric in enumerate(metrics, start=1):
+        if not isinstance(metric, dict) or not required.issubset(metric):
+            issues.append({"severity": "error", "row": index, "message": "invalid metric"})
+            continue
+        identifier = str(metric["metric_id"])
+        if identifier in identifiers:
+            issues.append({"severity": "error", "row": index, "message": "duplicate metric_id"})
+        identifiers.add(identifier)
+        if metric["coverage"] not in allowed_coverage:
+            issues.append({"severity": "error", "row": index, "message": "invalid coverage"})
+    return issues
+
+
 def refresh_product(root: Path, product_id: str, effective_date: date) -> RefreshOutcome:
     product_root = root / product_id
     source_path = product_root / "data" / "seed.csv"
     schema_path = product_root / "schemas" / "gka.schema.json"
     sources_path = product_root / "sources.json"
-    if not all(path.exists() for path in (source_path, schema_path, sources_path)):
+    catalog_path = product_root / "metric_catalog.json"
+    if not all(path.exists() for path in (source_path, schema_path, sources_path, catalog_path)):
         raise RefreshError(f"{product_id} refresh inputs are incomplete")
 
     source_bytes = source_path.read_bytes()
@@ -73,13 +95,15 @@ def refresh_product(root: Path, product_id: str, effective_date: date) -> Refres
         rows = list(csv.DictReader(handle))
     schema = _read_json(schema_path)
     sources = _read_json(sources_path)
-    issues = _validate_rows(rows, schema)
+    catalog = _read_json(catalog_path)
+    issues = _validate_rows(rows, schema) + _validate_metric_catalog(catalog)
     errors = [issue for issue in issues if issue["severity"] == "error"]
     if errors:
         raise RefreshError(f"{product_id} candidate failed validation: {errors}")
 
     effective = effective_date.isoformat()
-    artifact_hash = content_hash(source_bytes)
+    catalog_bytes = canonical_json(catalog)
+    artifact_hash = content_hash(source_bytes + catalog_bytes)
     artifact_id = f"{product_id}-gka-{effective}-{artifact_hash[:12]}"
     created = datetime.now(UTC).isoformat()
     manifest = ArtifactManifest(
@@ -103,6 +127,11 @@ def refresh_product(root: Path, product_id: str, effective_date: date) -> Refres
             {"name": "unique_record_id", "status": "passed"},
             {"name": "numeric_types", "status": "passed"},
             {"name": "non_empty", "status": "passed", "observed": len(rows)},
+            {
+                "name": "decision_metric_catalog",
+                "status": "passed",
+                "observed": len(catalog["metrics"]),
+            },
         ],
         "issues": issues,
         "source_dispositions": [
@@ -121,6 +150,7 @@ def refresh_product(root: Path, product_id: str, effective_date: date) -> Refres
     candidate.mkdir(parents=True, exist_ok=False)
     try:
         (candidate / "grand_knowledge_asset.csv").write_bytes(source_bytes)
+        (candidate / "metric_catalog.json").write_bytes(catalog_bytes)
         (candidate / "manifest.json").write_bytes(canonical_json(manifest.to_dict()))
         (candidate / "quality.json").write_bytes(canonical_json(quality))
         if release_dir.exists():

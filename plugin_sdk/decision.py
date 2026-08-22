@@ -16,6 +16,9 @@ class Question:
     maximum: float | None = None
     step: float | None = None
     default: float | None = None
+    importance: int = 50
+    why_it_matters: str = ""
+    expert_context: str = ""
 
 
 @dataclass(frozen=True, slots=True)

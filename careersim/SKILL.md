@@ -1,19 +1,22 @@
-# CareerSim Decision Skill v0.1
+# CareerSim Overseas Education Decision Skill v0.2
 
 ## Decision
 
-Given the learner's field, degree level, budget, geography, academic readiness, risk tolerance and
-primary objective, which education-path archetypes offer the strongest risk-adjusted human-capital
+For an Indian student considering overseas undergraduate, master's or PhD study, which destination
+and programme archetypes offer the strongest downside-adjusted return on the full education
 investment?
 
 ## Method
 
 1. Reject no option solely because it is expensive or selective; expose feasibility separately.
 2. Treat affordability as total cost, not tuition alone.
-3. Balance quality, employability and expected starting income against debt and completion risk.
-4. Prefer options matching the learner's field and declared geography.
-5. Surface a lower-cost resilient alternative even when the highest-scoring option is ambitious.
-6. Never imply admission, placement, salary or migration certainty.
+3. Use the earning market implied by the student's intended career path; never assume an overseas
+   salary when an early return to India is likely.
+4. Balance programme quality, employment evidence, work pathways and starting-income references
+   against funding, visa and completion risk.
+5. Treat a funded PhD differently from a self-funded taught degree.
+6. Surface lower-cost and lower-debt alternatives when they improve downside-adjusted ROI.
+7. Never imply admission, employment, salary, visa or migration certainty.
 
 ## Deterministic authority
 

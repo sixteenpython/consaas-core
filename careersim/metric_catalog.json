@@ -1,0 +1,183 @@
+{
+  "schema_version": "0.2.0",
+  "product_id": "careersim",
+  "decision": "ROI and downside risk of overseas education for an Indian student",
+  "metrics": [
+    {
+      "metric_id": "programme_recognition",
+      "label": "Programme recognition",
+      "decision_use": "Eligibility and credential validity",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "University and destination regulator"
+    },
+    {
+      "metric_id": "degree_level",
+      "label": "Degree level",
+      "decision_use": "Comparable duration, funding and outcome cohort",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Institution / programme"
+    },
+    {
+      "metric_id": "field",
+      "label": "Field of study",
+      "decision_use": "Labour-market and curriculum fit",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Institution / programme"
+    },
+    {
+      "metric_id": "destination",
+      "label": "Destination country or region",
+      "decision_use": "Visa, cost and labour-market context",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Government and institution"
+    },
+    {
+      "metric_id": "programme_duration",
+      "label": "Programme duration",
+      "decision_use": "Full cost and foregone-income calculation",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Institution"
+    },
+    {
+      "metric_id": "tuition_cost",
+      "label": "Tuition and mandatory fees",
+      "decision_use": "Full investment calculation",
+      "coverage": "available",
+      "freshness": "term",
+      "preferred_source": "Institution fee schedule"
+    },
+    {
+      "metric_id": "living_cost",
+      "label": "Living and health-insurance cost",
+      "decision_use": "All-in investment calculation",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Government / institution"
+    },
+    {
+      "metric_id": "scholarship_funding",
+      "label": "Scholarship or assistantship",
+      "decision_use": "Net cost and funding resilience",
+      "coverage": "available",
+      "freshness": "term",
+      "preferred_source": "Institution funding disclosure"
+    },
+    {
+      "metric_id": "loan_cost",
+      "label": "Education-loan rate and tenure",
+      "decision_use": "Debt-service downside scenario",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Lender sanction terms"
+    },
+    {
+      "metric_id": "currency_exposure",
+      "label": "INR currency exposure",
+      "decision_use": "Stress-test cost escalation",
+      "coverage": "available",
+      "freshness": "monthly",
+      "preferred_source": "RBI reference data"
+    },
+    {
+      "metric_id": "admission_fit",
+      "label": "Admission profile fit",
+      "decision_use": "Ambitious, balanced and resilient portfolio",
+      "coverage": "required_case_evidence",
+      "freshness": "application cycle",
+      "preferred_source": "Student evidence and programme criteria"
+    },
+    {
+      "metric_id": "completion_rate",
+      "label": "Programme completion rate",
+      "decision_use": "Probability-adjusted outcome",
+      "coverage": "planned_connector",
+      "freshness": "annual",
+      "preferred_source": "Institution / regulator"
+    },
+    {
+      "metric_id": "employment_rate",
+      "label": "Relevant employment rate",
+      "decision_use": "Probability-adjusted earnings",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Audited programme disclosure"
+    },
+    {
+      "metric_id": "starting_salary",
+      "label": "Starting salary distribution",
+      "decision_use": "ROI and debt-service calculation",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Audited programme disclosure"
+    },
+    {
+      "metric_id": "india_return_salary",
+      "label": "India return salary reference",
+      "decision_use": "ROI when earnings return to India",
+      "coverage": "available",
+      "freshness": "annual",
+      "preferred_source": "Indian labour-market reference"
+    },
+    {
+      "metric_id": "post_study_work",
+      "label": "Post-study work pathway",
+      "decision_use": "Time available to realise overseas earnings",
+      "coverage": "available",
+      "freshness": "policy change",
+      "preferred_source": "Destination government"
+    },
+    {
+      "metric_id": "visa_uncertainty",
+      "label": "Visa and policy uncertainty",
+      "decision_use": "Downside and optionality assessment",
+      "coverage": "available",
+      "freshness": "monthly review",
+      "preferred_source": "Destination government"
+    },
+    {
+      "metric_id": "tax_cost",
+      "label": "Income tax and compulsory deductions",
+      "decision_use": "Net earnings scenario",
+      "coverage": "planned_connector",
+      "freshness": "annual",
+      "preferred_source": "Destination tax authority"
+    },
+    {
+      "metric_id": "debt_stress",
+      "label": "Debt-service burden",
+      "decision_use": "Veto for fragile financing",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Calculated from case"
+    },
+    {
+      "metric_id": "roi_horizon",
+      "label": "Downside/base/upside payback horizon",
+      "decision_use": "Final financial comparison",
+      "coverage": "available",
+      "freshness": "decision time",
+      "preferred_source": "Deterministic engine"
+    },
+    {
+      "metric_id": "career_fit",
+      "label": "Career-goal alignment",
+      "decision_use": "Value beyond salary",
+      "coverage": "required_case_evidence",
+      "freshness": "decision time",
+      "preferred_source": "Student Case Knowledge Asset"
+    },
+    {
+      "metric_id": "source_quality",
+      "label": "Evidence quality and freshness",
+      "decision_use": "Recommendation authority",
+      "coverage": "available",
+      "freshness": "each refresh",
+      "preferred_source": "ConSaaS provenance"
+    }
+  ]
+}

@@ -8,8 +8,9 @@ From the repository root:
 python refresh_monthly.py --effective-date 2026-09-22
 ```
 
-The workflow validates all three source seeds, constructs isolated candidates, writes content hashes,
-manifests and quality results, and promotes each release atomically. The same date and content is
+The workflow validates all three source seeds and decision-metric catalogs, constructs isolated
+candidates, writes combined content hashes, manifests and quality results, and promotes each release
+atomically. The same date and content is
 idempotent. Different content cannot silently overwrite an existing effective date.
 
 ## Before refresh
@@ -19,6 +20,7 @@ idempotent. Different content cannot silently overwrite an existing effective da
 3. Do not infer unavailable values from marketing copy.
 4. Preserve source URLs, confidence and limitations.
 5. Use a new effective date whenever content changes.
+6. Review `metric_catalog.json`: mark evidence available only when a governed value/source exists.
 
 ## Validation and rollback
 

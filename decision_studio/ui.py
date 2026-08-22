@@ -11,13 +11,22 @@ from typing import Any, cast
 import streamlit as st
 
 from core.ai.adapters.groq import GroqProvider
+from core.ai.adapters.ollama import OllamaProvider
+from core.ai.contracts import LLMProvider
 from core.ai.registry import ModelRegistry
-from decision_studio.catalog import PRODUCTS, load_current_gka, load_skill
+from decision_studio.case import CaseKnowledgeAsset
+from decision_studio.catalog import (
+    PRODUCTS,
+    load_current_gka,
+    load_metric_catalog,
+    load_skill,
+)
+from decision_studio.consultant import deterministic_turn, model_turn
 from decision_studio.narrator import ConsultantNarrative, narrate
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.1.1"
+APP_VERSION = "0.2.0"
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -88,7 +97,7 @@ def _header() -> None:
         unsafe_allow_html=True,
     )
     st.caption(
-        f"Decision Studio Foundation v{APP_VERSION} · Explainable by design · No paid AI required"
+        f"Decision Studio Consulting v{APP_VERSION} · Explainable by design · No paid AI required"
     )
 
 
@@ -99,8 +108,9 @@ def _landing() -> None:
         unsafe_allow_html=True,
     )
     st.write(
-        "Each consultant asks only the questions needed to construct a canonical decision brief, "
-        "then evaluates it against governed knowledge and a versioned methodology."
+        "Each consultant asks the questions with the greatest decision value, preserves confirmed "
+        "facts in a Case Knowledge Asset, then evaluates them against governed knowledge and a "
+        "versioned methodology."
     )
     columns = st.columns(3, gap="large")
     for column, product in zip(columns, PRODUCTS.values(), strict=True):
@@ -112,7 +122,7 @@ def _landing() -> None:
                   <div class="cs-domain">{html.escape(product.domain)}</div>
                   <h3>{html.escape(product.name)}</h3>
                   <p>{html.escape(product.promise)}</p>
-                  <span class="cs-foundation">GKA v0.1 Foundation</span>
+                  <span class="cs-foundation">GKA v0.2 Decision Coverage</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -148,20 +158,25 @@ def _landing() -> None:
             st.markdown(f"**{title}**")
             st.caption(body)
     st.warning(
-        "Foundation coverage is intentionally small and illustrative. Verify current programme, "
-        "property and venture evidence before making a consequential commitment."
+        "Decision-metric coverage is comprehensive by design; currently available observations "
+        "remain illustrative. Verify exact programme, property and venture evidence before a "
+        "consequential commitment."
     )
 
 
 def _consultation(product_id: str) -> dict[str, Any]:
     consultations = st.session_state.consultations
     if product_id not in consultations:
-        consultations[product_id] = {"answers": {}, "messages": [], "report": None}
+        consultations[product_id] = {
+            "case": CaseKnowledgeAsset(product_id),
+            "messages": [],
+            "report": None,
+        }
     return cast(dict[str, Any], consultations[product_id])
 
 
-def _answer_widget(question: Question) -> Any:
-    key = f"answer-{st.session_state.selected_product}-{question.question_id}"
+def _answer_widget(question: Question, *, key_prefix: str = "answer") -> Any:
+    key = f"{key_prefix}-{st.session_state.selected_product}-{question.question_id}"
     if question.answer_type == "choice":
         return st.selectbox("Your answer", question.options, key=key, label_visibility="collapsed")
     return st.number_input(
@@ -223,73 +238,161 @@ def _display_rows(values: dict[str, Any]) -> list[dict[str, str]]:
 
 def _render_consultant(product_id: str, service: DecisionStudio) -> None:
     state = _consultation(product_id)
+    case: CaseKnowledgeAsset = state["case"]
+    answers = case.values
     questions = service.questions(product_id)
-    answered = len(state["answers"])
+    answered = len(answers)
+    expert_runtime = _expert_runtime()
+    use_model = st.toggle(
+        "Open-model expert wording",
+        value=False,
+        key=f"expert-model-{product_id}",
+        disabled=expert_runtime is None,
+        help=(
+            "Uses a configured Apache-2.0 open-weight model only for conversational wording. "
+            "Confirmed facts and deterministic decisions remain governed by the application."
+        ),
+    )
+    if expert_runtime and expert_runtime[2]:
+        st.caption(
+            "Optional hosted open-weight wording is available. Turning it on sends this "
+            "anonymous consultation externally; it cannot alter the Case Knowledge Asset."
+        )
+    elif expert_runtime:
+        st.caption(
+            "Private local open-model wording is available through Ollama. Model text cannot "
+            "alter confirmed facts, scores or verdicts."
+        )
+    else:
+        st.caption(
+            "Governed expert conversation is active. A local Ollama or configured open-weight "
+            "runtime can enhance wording without changing the decision."
+        )
     st.progress(
         answered / len(questions), text=f"Decision brief: {answered}/{len(questions)} established"
     )
     if not state["messages"]:
         with st.chat_message("assistant"):
             st.write(
-                "I will build this decision one constraint at a time. I will not force a verdict "
-                "when the evidence is too thin."
+                "Let’s work through the decision together. I’ll explain why each issue matters, "
+                "adapt the conversation as your situation becomes clearer, and preserve confirmed "
+                "facts in a Case Knowledge Asset. I will not force a verdict when evidence is thin."
             )
     for message in state["messages"]:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     if answered < len(questions):
-        question = questions[answered]
+        question = service.next_question(product_id, answers)
+        if question is None:
+            raise RuntimeError("consultation has unresolved coverage but no next question")
         with st.chat_message("assistant"):
             st.markdown(f"**{question.prompt}**")
-            st.caption("This answer becomes part of your canonical decision brief.")
+            st.caption(f"Why this matters: {question.why_it_matters}")
         with st.form(f"question-{product_id}-{question.question_id}"):
             answer = _answer_widget(question)
             submitted = st.form_submit_button(
                 "Preserve answer and continue", type="primary", width="stretch"
             )
         if submitted:
-            state["answers"][question.question_id] = answer
+            updated_case = case.confirm(question.question_id, answer)
+            state["case"] = updated_case
             shown = (
-                f"₹{float(answer):,.0f}" if question.question_id.endswith("_inr") else str(answer)
+                _format_inr(float(answer))
+                if question.question_id.endswith("_inr")
+                else str(answer)
             )
+            turn = deterministic_turn(question, shown)
+            if use_model and expert_runtime:
+                try:
+                    turn = model_turn(
+                        question,
+                        shown,
+                        updated_case.values,
+                        load_skill(ROOT, product_id),
+                        expert_runtime[0],
+                        expert_runtime[1],
+                    )
+                except (ValueError, RuntimeError, json.JSONDecodeError):
+                    turn = deterministic_turn(question, shown)
             state["messages"].extend(
                 [
                     {"role": "user", "content": shown},
                     {
                         "role": "assistant",
-                        "content": "Understood. I have preserved that constraint.",
+                        "content": f"{turn.acknowledgement}\n\n{turn.implication}",
                     },
                 ]
             )
-            if len(state["answers"]) == len(questions):
-                state["report"] = service.decide(product_id, state["answers"])
+            if len(updated_case.values) == len(questions):
+                state["report"] = service.decide(product_id, updated_case.values)
             st.rerun()
     else:
         st.success("Your decision brief is complete. The deterministic assessment is ready.")
         if st.button("Rebuild assessment", width="stretch"):
-            state["report"] = service.decide(product_id, state["answers"])
+            state["report"] = service.decide(product_id, answers)
             st.rerun()
 
 
 def _render_brief(product_id: str, service: DecisionStudio) -> None:
     state = _consultation(product_id)
+    case: CaseKnowledgeAsset = state["case"]
+    answers = case.values
     questions = {question.question_id: question for question in service.questions(product_id)}
-    st.subheader("Canonical decision brief")
-    st.caption("This structured asset—not the conversational transcript—is evaluated.")
-    if not state["answers"]:
+    st.subheader("Canonical Case Knowledge Asset")
+    st.caption(
+        "Confirmed facts—not the conversational transcript—are evaluated. Every revision is "
+        "preserved for this anonymous session."
+    )
+    if not answers:
         st.info("Answer the first consultant question to begin the brief.")
         return
-    for key, value in state["answers"].items():
+    for key, value in answers.items():
         with st.container(border=True):
             st.markdown(
                 f'<div class="cs-section">{questions[key].prompt}</div>', unsafe_allow_html=True
             )
             if key.endswith("_inr"):
-                st.markdown(f"**₹{float(value):,.0f}**")
+                st.markdown(f"**{_format_inr(float(value))}**")
             else:
                 st.markdown(f"**{value}**")
+            st.caption("Confirmed · source: user")
+    with st.expander("Revise a confirmed fact"):
+        revision_key = st.selectbox(
+            "Fact to revise",
+            tuple(answers),
+            format_func=lambda key: questions[key].prompt,
+            key=f"revision-field-{product_id}",
+        )
+        revised_value = _answer_widget(
+            questions[revision_key], key_prefix=f"revision-{len(case.revisions)}"
+        )
+        if st.button("Preserve revision and reassess", key=f"revise-{product_id}"):
+            state["case"] = case.confirm(
+                revision_key, revised_value, reason="User revised a confirmed fact"
+            )
+            state["report"] = service.decide(product_id, state["case"].values)
+            st.rerun()
+    if case.revisions:
+        with st.expander(f"Revision history · {len(case.revisions)}"):
+            st.dataframe(
+                [
+                    {
+                        "Revision": item.revision,
+                        "Fact": _display_label(item.question_id),
+                        "Previous": _display_value(item.question_id, item.previous_value),
+                        "Current": _display_value(item.question_id, item.new_value),
+                    }
+                    for item in case.revisions
+                ],
+                width="stretch",
+                hide_index=True,
+            )
     if st.button("Start this consultation again", type="secondary"):
-        st.session_state.consultations[product_id] = {"answers": {}, "messages": [], "report": None}
+        st.session_state.consultations[product_id] = {
+            "case": case.reset(),
+            "messages": [],
+            "report": None,
+        }
         st.session_state.narratives.pop(product_id, None)
         st.rerun()
 
@@ -324,6 +427,19 @@ def _secret(name: str) -> str | None:
         return str(st.secrets[name]) if name in st.secrets else None
     except Exception:
         return None
+
+
+def _expert_runtime() -> tuple[LLMProvider, str, bool] | None:
+    """Resolve optional local-first expert wording without coupling product logic."""
+    local_model = os.getenv("CONSAAS_OLLAMA_MODEL")
+    if local_model:
+        return OllamaProvider(), local_model, False
+    key = _secret("GROQ_API_KEY")
+    if key:
+        registry = ModelRegistry.from_file(ROOT / "factory" / "model_registry.json")
+        model = registry.resolve_hosted("conversation")
+        return GroqProvider(key), model.runtime_name, True
+    return None
 
 
 def _render_narrative(product_id: str, report: DecisionReport) -> None:
@@ -418,16 +534,35 @@ def _render_result(product_id: str) -> None:
 
 def _render_knowledge(product_id: str) -> None:
     rows, manifest = load_current_gka(ROOT, product_id)
-    st.subheader("Grand Knowledge Asset · Foundation")
+    catalog = load_metric_catalog(ROOT, product_id)
+    metrics_catalog = catalog["metrics"]
+    available = sum(item["coverage"] == "available" for item in metrics_catalog)
+    st.subheader("Grand Knowledge Asset · Decision coverage")
     st.warning(
-        "This is a small governed seed asset, not exhaustive market coverage. Use it to structure "
-        "a decision and identify diligence—not as current transactional truth."
+        "The asset distinguishes available evidence from required-but-missing evidence. Coverage "
+        "is expanded only through governed sources; unavailable facts are never invented."
     )
     cols = st.columns(4)
-    cols[0].metric("Records", manifest["row_count"])
-    cols[1].metric("Effective", manifest["effective_date"])
-    cols[2].metric("Quality", manifest["quality_state"].title())
-    cols[3].metric("Schema", manifest["schema_version"])
+    cols[0].metric("Decision metrics", len(metrics_catalog))
+    cols[1].metric("Currently available", available)
+    cols[2].metric("Evidence coverage", f"{available / len(metrics_catalog):.0%}")
+    cols[3].metric("GKA effective", manifest["effective_date"])
+    with st.expander("Decision metric catalog", expanded=True):
+        st.dataframe(
+            [
+                {
+                    "Metric": item["label"],
+                    "Decision use": item["decision_use"],
+                    "Coverage": item["coverage"].replace("_", " ").title(),
+                    "Freshness": item["freshness"],
+                    "Preferred source": item["preferred_source"],
+                }
+                for item in metrics_catalog
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+    st.subheader("Current governed observations")
     st.dataframe(rows, width="stretch", hide_index=True)
     with st.expander("Artifact identity"):
         st.dataframe(_display_rows(manifest), width="stretch", hide_index=True)
@@ -474,5 +609,5 @@ def main() -> None:
     st.divider()
     st.caption(
         "Decision support only—not financial, legal, admission, property-valuation or investment "
-        "advice. Anonymous session; no durable personal-data storage in this Foundation release."
+        "advice. Anonymous session; no durable personal-data storage in this release."
     )

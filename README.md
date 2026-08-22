@@ -6,13 +6,14 @@ ConSaaS Core is the operating system for explainable Decision Intelligence produ
 
 The root Streamlit application now contains three bounded, runnable Decision Intelligence journeys:
 
-- **CareerSim** for higher-education investment decisions;
+- **CareerSim** for Indian students evaluating overseas undergraduate, master's and PhD ROI;
 - **HouseWise** for Indian residential purchase decisions;
 - **StartupEval** for founder and investor venture assessment.
 
-Each journey uses a canonical session-only decision brief, a promoted `GKA v0.1 Foundation`, a
-versioned deterministic policy, explainable recommendations and optional validated open-model
-narration. Run it with `streamlit run streamlit_app.py`.
+Each journey uses an adaptive expert conversation, a revision-aware session-only Case Knowledge
+Asset, a promoted GKA with explicit decision-metric coverage, a versioned deterministic policy,
+explainable recommendations and optional validated open-model wording. Run it with
+`streamlit run streamlit_app.py`.
 
 Refresh all three promoted knowledge assets with:
 

@@ -25,8 +25,8 @@ PRODUCTS = {
     "careersim": ProductCard(
         "careersim",
         "CareerSim",
-        "Higher education intelligence",
-        "Choose the education investment that best fits your ability, economics and ambition.",
+        "Overseas education ROI intelligence",
+        "Help Indian students test whether an overseas degree is worth its full cost and risk.",
         "#315b7d",
         "◎",
     ),
@@ -68,6 +68,9 @@ def load_questions(root: Path, product_id: str) -> tuple[Question, ...]:
             maximum=item.get("max"),
             step=item.get("step"),
             default=item.get("default"),
+            importance=int(item.get("importance", 50)),
+            why_it_matters=str(item.get("why_it_matters", "")),
+            expert_context=str(item.get("expert_context", "")),
         )
         for item in raw["questions"]
     )
@@ -88,3 +91,8 @@ def load_current_gka(root: Path, product_id: str) -> tuple[list[dict[str, str]],
 
 def load_skill(root: Path, product_id: str) -> str:
     return (root / product_id / "SKILL.md").read_text(encoding="utf-8")
+
+
+def load_metric_catalog(root: Path, product_id: str) -> dict[str, Any]:
+    pointer = _json(root / "knowledge" / "releases" / product_id / "current.json")
+    return _json(root / pointer["release_path"] / "metric_catalog.json")

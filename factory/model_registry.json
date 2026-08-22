@@ -2,6 +2,36 @@
   "schema_version": 1,
   "models": [
     {
+      "model_id": "qwen3-8b",
+      "runtime_name": "qwen3:8b",
+      "provider": "ollama",
+      "license": "Apache-2.0",
+      "capabilities": ["structured_extraction", "conversation", "recommendation"],
+      "minimum_ram_gb": 8,
+      "context_tokens": 32768,
+      "enabled": true
+    },
+    {
+      "model_id": "qwen3-14b",
+      "runtime_name": "qwen3:14b",
+      "provider": "ollama",
+      "license": "Apache-2.0",
+      "capabilities": ["structured_extraction", "conversation", "recommendation"],
+      "minimum_ram_gb": 16,
+      "context_tokens": 32768,
+      "enabled": true
+    },
+    {
+      "model_id": "gpt-oss-20b",
+      "runtime_name": "gpt-oss:20b",
+      "provider": "ollama",
+      "license": "Apache-2.0",
+      "capabilities": ["structured_extraction", "conversation", "recommendation"],
+      "minimum_ram_gb": 18,
+      "context_tokens": 131072,
+      "enabled": true
+    },
+    {
       "model_id": "granite-3.3-8b-instruct",
       "runtime_name": "granite3.3:8b",
       "provider": "ollama",

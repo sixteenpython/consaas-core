@@ -1,6 +1,6 @@
 {
-  "schema_version": "0.1.0",
-  "methodology_version": "0.1.0",
-  "required_columns": ["record_id", "option_name", "degree_level", "field", "geography", "total_cost_inr", "quality_score", "employability_score", "median_start_salary_inr", "risk_score", "source_id", "source_url", "observed_on", "confidence"],
-  "numeric_columns": ["total_cost_inr", "quality_score", "employability_score", "median_start_salary_inr", "risk_score"]
+  "schema_version":"0.2.0",
+  "methodology_version":"0.2.0",
+  "required_columns":["record_id","option_name","degree_level","field","target_region","duration_years","tuition_inr","living_cost_inr","total_cost_inr","funding_model","scholarship_score","work_rights_score","visa_uncertainty_score","quality_score","employability_score","overseas_start_salary_inr","india_return_salary_inr","employment_probability_score","roi_horizon_years","risk_score","source_id","source_url","observed_on","confidence"],
+  "numeric_columns":["duration_years","tuition_inr","living_cost_inr","total_cost_inr","scholarship_score","work_rights_score","visa_uncertainty_score","quality_score","employability_score","overseas_start_salary_inr","india_return_salary_inr","employment_probability_score","roi_horizon_years","risk_score"]
 }

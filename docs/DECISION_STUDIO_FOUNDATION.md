@@ -7,7 +7,7 @@ Product decision: 2026-08-22
 
 ConSaaS Decision Studio is one Streamlit application with three bounded specialist journeys:
 
-- CareerSim — compare higher-education and career-path investments;
+- CareerSim — assess overseas education ROI for Indian students across UG, master's and PhD;
 - HouseWise — compare Indian residential purchase locations;
 - StartupEval — assess pre-seed through Series A ventures from founder or investor context.
 
@@ -38,7 +38,7 @@ The MVP is a modular monolith.
 Streamlit UI
   -> consultation service
       -> product question contract
-      -> canonical Consultation Asset (session-only)
+      -> canonical Case Knowledge Asset with revisions (session-only)
       -> product decision engine
           -> promoted GKA
           -> versioned decision policy
@@ -54,7 +54,7 @@ No product imports another product.
 
 ## Deterministic and model boundary
 
-Deterministic code owns question order, answer validation, eligibility gates, calculations,
+Deterministic code owns information-value question selection, answer validation, eligibility gates, calculations,
 weights, ranking, verdict thresholds, evidence references, confidence/data-sufficiency, manifests
 and report structure. A configured open-weight model may translate the immutable decision result
 into concise consultant prose using the product `SKILL.md`. Model output is untrusted, schema
@@ -75,8 +75,8 @@ Local Ollama remains the private profile. No paid inference service is required.
 
 ## Initial coverage
 
-- CareerSim: India-first, ages 16–30, Indian and overseas study options represented by a small
-  illustrative option set.
+- CareerSim: Indian students assessing overseas UG, master's and PhD options represented by a
+  governed illustrative archetype set.
 - HouseWise: Bengaluru, Mumbai, Pune, Hyderabad, Chennai, Delhi NCR and Kolkata locality archetypes.
 - StartupEval: India-first sector/stage benchmarks for founder and investor evaluation.
 
