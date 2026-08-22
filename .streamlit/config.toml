@@ -1,0 +1,4 @@
+[server]
+# Streamlit Cloud runs immutable Git releases; source hot-reload is unnecessary in production.
+# Disabling it also prevents large repository trees from exhausting Linux inotify handles.
+fileWatcherType = "none"

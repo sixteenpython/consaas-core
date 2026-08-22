@@ -33,7 +33,7 @@ class DecisionStudio:
         return tuple(
             question.question_id
             for question in self.questions(product_id)
-            if question.question_id not in answers
+            if answers.get(question.question_id) is None
         )
 
     def decide_if_ready(self, product_id: str, answers: dict[str, Any]) -> DecisionReport | None:

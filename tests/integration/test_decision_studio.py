@@ -131,6 +131,11 @@ def test_unknown_fact_blocks_reassessment_after_unrelated_revision() -> None:
     with pytest.raises(ValueError, match="runway_months"):
         service.decide("startup", revised)
 
+    # Older anonymous sessions may retain an explicit null for an unresolved fact.
+    null_runway = {**revised, "runway_months": None}
+    assert service.missing_answers("startup", null_runway) == ("runway_months",)
+    assert service.decide_if_ready("startup", null_runway) is None
+
 
 @pytest.mark.parametrize("product_id", ["careersim", "housewise", "startup"])
 def test_each_promoted_gka_declares_broad_decision_coverage(product_id: str) -> None:
