@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "items": [
+    {"id": "NARRATIVE-001", "kind": "feature", "status": "REVIEW", "depends_on": ["AI-001", "EVAL-001"]},
+    {"id": "NARRATIVE-001-T01", "kind": "task", "status": "REVIEW", "depends_on": []},
+    {"id": "NARRATIVE-002-T01", "kind": "task", "status": "READY", "depends_on": ["NARRATIVE-001-T01"]},
+    {"id": "NARRATIVE-003", "kind": "feature", "status": "BACKLOG", "depends_on": ["NARRATIVE-002-T01"]}
+  ]
+}
+

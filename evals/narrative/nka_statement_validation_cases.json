@@ -1,0 +1,39 @@
+[
+  {
+    "name": "grounded inference accepted",
+    "accepted": true,
+    "input": {
+      "field_path": "characters.maya.motivation",
+      "value": "Protect her brother",
+      "epistemic_status": "inferred",
+      "evidence_refs": [{"artifact_id": "draft-1", "span_id": "page-12-lines-3-8"}],
+      "confidence": 0.82,
+      "model_run_id": "run-42"
+    }
+  },
+  {
+    "name": "ungrounded inference rejected",
+    "accepted": false,
+    "input": {
+      "field_path": "theme",
+      "value": "Identity is chosen",
+      "epistemic_status": "inferred",
+      "evidence_refs": [],
+      "confidence": 0.65,
+      "model_run_id": "run-43"
+    }
+  },
+  {
+    "name": "model-authored user fact rejected",
+    "accepted": false,
+    "input": {
+      "field_path": "premise",
+      "value": "A pilot returns home",
+      "epistemic_status": "user_asserted",
+      "evidence_refs": [],
+      "confidence": null,
+      "model_run_id": "run-44"
+    }
+  }
+]
+

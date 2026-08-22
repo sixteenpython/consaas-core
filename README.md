@@ -19,9 +19,11 @@ The platform supplies run orchestration, immutable artifacts, provenance, schema
 
 Every stage consumes and emits a versioned artifact envelope. A release is promoted only when all required contracts, quality gates, policy checks, and product smoke tests pass.
 
-## Architecture status
+## Factory status
 
-This repository is currently an architecture blueprint, not an implementation. The documents in [docs](./docs) define the intended boundaries and migration path. Vriddhi remains the production system and first reference product while capabilities are extracted incrementally through compatibility adapters.
+The repository now contains the first controlled factory bootstrap: governance, scoped agent contracts, Feature Creator, task/backlog conventions, product templates, local-AI contracts, a model registry, architecture guardrails, tests, offline evaluations, and a GitLab CI definition. Vriddhi remains the production reference product; Narrative Architect contains only one deliberately small validation slice.
+
+See [FACTORY_STATUS.md](./FACTORY_STATUS.md). Items remain in `REVIEW` until human review and a real GitLab pipeline are available; the configured remote is currently GitHub, so this repository does not claim a GitLab merge request has run.
 
 ## Design goals
 
@@ -34,7 +36,7 @@ This repository is currently an architecture blueprint, not an implementation. T
 
 ## Reading order
 
-Start with [VISION.md](./docs/VISION.md), [FIRST_PRINCIPLES.md](./docs/FIRST_PRINCIPLES.md), [ARCHITECTURE.md](./docs/ARCHITECTURE.md), and [PLUGIN_SDK.md](./docs/PLUGIN_SDK.md). The migration sequence is in [ROADMAP.md](./docs/ROADMAP.md).
+Start with the [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Vision](./docs/VISION.md), [First Principles](./docs/FIRST_PRINCIPLES.md), [Architecture](./docs/ARCHITECTURE.md), and root [AGENTS.md](./AGENTS.md). Factory operation is defined by [Factory Mode](./docs/FACTORY_MODE.md), [Feature Creator](./docs/FEATURE_CREATOR.md), and the [Definition of Done](./docs/DEFINITION_OF_DONE.md).
 
 ## Document map
 
@@ -43,3 +45,16 @@ Start with [VISION.md](./docs/VISION.md), [FIRST_PRINCIPLES.md](./docs/FIRST_PRI
 - Contracts: [Plugin SDK](./docs/PLUGIN_SDK.md), [Golden Knowledge Asset](./docs/GOLDEN_KNOWLEDGE_ASSET.md), [Decision Engine](./docs/DECISION_ENGINE.md), [Data Connectors](./docs/DATA_CONNECTOR_FRAMEWORK.md), [Report Engine](./docs/REPORT_ENGINE.md)
 - Delivery: [Product Generator](./docs/PRODUCT_GENERATOR.md), [Roadmap](./docs/ROADMAP.md), [Coding Standards](./docs/CODING_STANDARDS.md), [ADR Register](./docs/ARCHITECTURE_DECISION_RECORDS.md)
 - Extraction: [Vriddhi Module Inventory](./docs/VRIDDHI_MODULE_INVENTORY.md)
+- Narrative Architect: [Architecture](./docs/NARRATIVE_ARCHITECTURE.md), [Narrative Knowledge Asset](./docs/NARRATIVE_KNOWLEDGE_ASSET.md), [Virtual Screenplay Expert](./docs/VIRTUAL_SCREENPLAY_EXPERT.md), [MVP Scope](./docs/MVP_SCOPE.md), [Implementation Roadmap](./docs/IMPLEMENTATION_ROADMAP.md)
+- Factory: [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Factory Mode](./docs/FACTORY_MODE.md), [Quality Gates](./docs/QUALITY_GATES.md), [Architecture Guardrails](./docs/ARCHITECTURE_GUARDRAILS.md), [Initial Backlog](./docs/INITIAL_FACTORY_BACKLOG.md)
+- Assurance: [AI Evaluation](./docs/AI_EVALUATION.md), [Security](./docs/SECURITY.md), [Privacy](./docs/PRIVACY.md), [Observability](./docs/OBSERVABILITY.md), [Reproducibility](./docs/REPRODUCIBILITY.md)
+
+## Local verification
+
+```powershell
+python -m pytest -q
+python evals/run_nka_statement_eval.py
+python -m factory.guardrails .
+```
+
+Install the optional `dev` dependencies to run formatting, linting, typing, security, and dependency-audit gates identical to `.gitlab-ci.yml`.

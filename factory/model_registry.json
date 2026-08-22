@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "model_id": "granite-3.3-8b-instruct",
+      "runtime_name": "granite3.3:8b",
+      "provider": "ollama",
+      "license": "Apache-2.0",
+      "capabilities": ["structured_extraction", "conversation", "recommendation"],
+      "minimum_ram_gb": 12,
+      "context_tokens": 128000,
+      "enabled": true
+    },
+    {
+      "model_id": "qwen3-30b-a3b",
+      "runtime_name": "qwen3:30b-a3b",
+      "provider": "ollama",
+      "license": "Apache-2.0",
+      "capabilities": ["long_context_analysis", "conversation", "recommendation"],
+      "minimum_ram_gb": 24,
+      "context_tokens": 131072,
+      "enabled": true
+    }
+  ]
+}
+

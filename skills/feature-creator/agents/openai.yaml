@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Creator"
+  short_description: "Turn product ideas into factory-ready features"
+  default_prompt: "Use $feature-creator to turn this product idea into a factory-ready feature specification."

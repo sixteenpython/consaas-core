@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-08-22",
+  "bootstrap": "review",
+  "source_control": {
+    "configured_remote": "github",
+    "gitlab_pipeline_definition": true,
+    "gitlab_pipeline_executed": false,
+    "merge_request_created": false
+  },
+  "capabilities": {
+    "constitution": "review",
+    "agent_operating_system": "review",
+    "feature_creator": "review",
+    "quality_gates": "review",
+    "local_ai_abstraction": "review",
+    "model_registry": "review",
+    "product_template": "review",
+    "narrative_demo": "review"
+  },
+  "products": [
+    {"id": "vriddhi", "status": "live", "owner": "product-owner"},
+    {"id": "narrative", "status": "implementation-starting", "owner": "product-owner"},
+    {"id": "housewise", "status": "planned", "owner": "product-owner"},
+    {"id": "careersim", "status": "planned", "owner": "product-owner"}
+  ],
+  "tasks": {
+    "NARRATIVE-001-T01": {"status": "review", "tests": 7, "evaluation_cases": 3},
+    "NARRATIVE-002-T01": {"status": "ready", "tests": 0, "evaluation_cases": 0}
+  },
+  "blockers": ["authoritative GitLab remote and runner are not configured"],
+  "milestones": [
+    {"id": "factory-bootstrap", "status": "review"},
+    {"id": "narrative-vertical-slice-1", "status": "not-started"}
+  ],
+  "next_ready_task": "NARRATIVE-002-T01"
+}

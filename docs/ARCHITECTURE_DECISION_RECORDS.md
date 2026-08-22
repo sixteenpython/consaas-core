@@ -39,3 +39,18 @@ Supersedes / superseded by
 ```
 
 Before implementation, ADR-001 through ADR-009 should be accepted or revised by platform and Vriddhi owners. ADR-010 additionally requires security/model-risk review.
+
+## Narrative Architect ADRs
+
+Narrative Architect decisions are maintained separately so domain constraints do not silently become Core policy:
+
+1. [ADR-NA-001: Modular monolith](./adrs/narrative/ADR-NA-001-MODULAR-MONOLITH.md)
+2. [ADR-NA-002: NKA canonical truth](./adrs/narrative/ADR-NA-002-NKA-CANONICAL-TRUTH.md)
+3. [ADR-NA-003: Typed patches and human authority](./adrs/narrative/ADR-NA-003-TYPED-PATCHES-HUMAN-AUTHORITY.md)
+4. [ADR-NA-004: Local model port](./adrs/narrative/ADR-NA-004-LOCAL-MODEL-PORT.md)
+5. [ADR-NA-005: Deterministic authority](./adrs/narrative/ADR-NA-005-DETERMINISTIC-AUTHORITY.md)
+6. [ADR-NA-006: Explicit SIS scales](./adrs/narrative/ADR-NA-006-EXPLICIT-SIS-SCALES.md)
+7. [ADR-NA-007: Evidence graph](./adrs/narrative/ADR-NA-007-EVIDENCE-GRAPH.md)
+8. [ADR-NA-008: Immutable revision graph](./adrs/narrative/ADR-NA-008-IMMUTABLE-REVISION-GRAPH.md)
+9. [ADR-NA-009: Hierarchical screenplay analysis](./adrs/narrative/ADR-NA-009-HIERARCHICAL-SCREENPLAY-ANALYSIS.md)
+10. [ADR-NA-010: SDI extension boundary](./adrs/narrative/ADR-NA-010-SDI-EXTENSION-BOUNDARY.md)

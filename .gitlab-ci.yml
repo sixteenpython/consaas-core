@@ -1,0 +1,45 @@
+image: python:3.12-slim
+
+stages: [validate, test, evaluate, security]
+
+default:
+  before_script:
+    - python -m pip install --upgrade pip
+    - python -m pip install -e ".[dev]"
+
+format-and-lint:
+  stage: validate
+  script:
+    - ruff format --check core factory narrative/src narrative/tests tests evals skills/feature-creator/scripts
+    - ruff check core factory narrative/src narrative/tests tests evals skills/feature-creator/scripts
+
+type-check:
+  stage: validate
+  script:
+    - mypy
+
+architecture-guardrails:
+  stage: validate
+  script:
+    - python -m factory.guardrails .
+
+unit-tests:
+  stage: test
+  script:
+    - pytest -q -m "not integration"
+
+integration-tests:
+  stage: test
+  script:
+    - pytest -q -m integration
+
+offline-ai-evaluations:
+  stage: evaluate
+  script:
+    - python evals/run_nka_statement_eval.py
+
+security-scan:
+  stage: security
+  script:
+    - bandit -q -r core factory narrative/src
+    - pip-audit --skip-editable

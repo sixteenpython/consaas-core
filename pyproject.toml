@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "consaas-core"
+version = "0.1.0"
+description = "The Decision Intelligence Factory shared by ConSaaS products"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "bandit>=1.8,<2",
+  "mypy>=1.14,<2",
+  "pip-audit>=2.7,<3",
+  "pytest>=8,<10",
+  "ruff>=0.9,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "factory*"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "narrative/src"]
+testpaths = ["tests", "narrative/tests"]
+addopts = "--basetemp=.pytest-tmp"
+markers = ["integration: cross-module integration tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+"narrative/tests/**/*.py" = ["S101"]
+"core/ai/adapters/ollama.py" = ["S310"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["core", "factory", "narrative/src"]
