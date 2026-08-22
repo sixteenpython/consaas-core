@@ -109,6 +109,29 @@ def test_declared_priority_and_role_change_the_prescription() -> None:
     assert founder.next_actions != investor.next_actions
 
 
+def test_unknown_fact_blocks_reassessment_after_unrelated_revision() -> None:
+    service = DecisionStudio(ROOT)
+    incomplete_startup = {
+        "role": "Founder",
+        "stage": "Scaling",
+        "sector": "Fintech",
+        "monthly_revenue_inr": 500000,
+        "monthly_growth_pct": 8,
+        "retention_pct": 65,
+        "gross_margin_pct": 55,
+        "customer_evidence": "Repeated paid use",
+        "team_strength": "Complete and proven",
+        "regulatory_risk": "Low",
+    }
+
+    # Runway is explicitly unknown, so revising role must not call the Startup engine.
+    revised = {**incomplete_startup, "role": "Investor"}
+    assert service.missing_answers("startup", revised) == ("runway_months",)
+    assert service.decide_if_ready("startup", revised) is None
+    with pytest.raises(ValueError, match="runway_months"):
+        service.decide("startup", revised)
+
+
 @pytest.mark.parametrize("product_id", ["careersim", "housewise", "startup"])
 def test_each_promoted_gka_declares_broad_decision_coverage(product_id: str) -> None:
     catalog = load_metric_catalog(ROOT, product_id)

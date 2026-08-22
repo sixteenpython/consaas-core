@@ -28,7 +28,26 @@ class DecisionStudio:
     ) -> Question | None:
         return select_next_question(product_id, self.questions(product_id), answers, excluded_ids)
 
+    def missing_answers(self, product_id: str, answers: dict[str, Any]) -> tuple[str, ...]:
+        """Return required consultation fields that are not decision-ready."""
+        return tuple(
+            question.question_id
+            for question in self.questions(product_id)
+            if question.question_id not in answers
+        )
+
+    def decide_if_ready(self, product_id: str, answers: dict[str, Any]) -> DecisionReport | None:
+        """Evaluate only a complete governed case; unresolved facts never reach an engine."""
+        if self.missing_answers(product_id, answers):
+            return None
+        return self.decide(product_id, answers)
+
     def decide(self, product_id: str, answers: dict[str, Any]) -> DecisionReport:
+        missing = self.missing_answers(product_id, answers)
+        if missing:
+            raise ValueError(
+                "decision case is incomplete; missing decision-ready answers: " + ", ".join(missing)
+            )
         rows, manifest = load_current_gka(self.root, product_id)
         policy = load_policy(self.root, product_id)
         engines = {

@@ -182,15 +182,24 @@ def _consultation(product_id: str) -> dict[str, Any]:
     return cast(dict[str, Any], consultations[product_id])
 
 
-def _answer_widget(question: Question, *, key_prefix: str = "answer") -> Any:
+def _answer_widget(
+    question: Question, *, key_prefix: str = "answer", initial_value: Any = None
+) -> Any:
     key = f"{key_prefix}-{st.session_state.selected_product}-{question.question_id}"
     if question.answer_type == "choice":
-        return st.selectbox("Your answer", question.options, key=key, label_visibility="collapsed")
+        index = question.options.index(initial_value) if initial_value in question.options else 0
+        return st.selectbox(
+            "Your answer",
+            question.options,
+            index=index,
+            key=key,
+            label_visibility="collapsed",
+        )
     return st.number_input(
         "Your answer",
         min_value=question.minimum,
         max_value=question.maximum,
-        value=question.default,
+        value=initial_value if initial_value is not None else question.default,
         step=question.step,
         key=key,
         label_visibility="collapsed",
@@ -257,10 +266,7 @@ def _complete_dialogue_action(
             "model_id": action.model_id,
         }
     )
-    if len(state["case"].values) == len(service.questions(product_id)):
-        state["report"] = service.decide(product_id, state["case"].values)
-    else:
-        state["report"] = None
+    state["report"] = service.decide_if_ready(product_id, state["case"].values)
     state["pending_turn"] = None
 
 
@@ -468,14 +474,17 @@ def _render_brief(product_id: str, service: DecisionStudio) -> None:
             format_func=lambda key: questions[key].prompt,
             key=f"revision-field-{product_id}",
         )
+        existing = case.fact_map[revision_key]
         revised_value = _answer_widget(
-            questions[revision_key], key_prefix=f"revision-{len(case.revisions)}"
+            questions[revision_key],
+            key_prefix=f"revision-{len(case.revisions)}",
+            initial_value=existing.value,
         )
         if st.button("Preserve revision and reassess", key=f"revise-{product_id}"):
             state["case"] = case.confirm(
                 revision_key, revised_value, reason="User revised a confirmed fact"
             )
-            state["report"] = service.decide(product_id, state["case"].values)
+            state["report"] = service.decide_if_ready(product_id, state["case"].values)
             st.rerun()
     if case.revisions:
         with st.expander(f"Revision history · {len(case.revisions)}"):
