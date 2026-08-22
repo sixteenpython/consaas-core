@@ -17,7 +17,7 @@ from decision_studio.narrator import ConsultantNarrative, narrate
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.1.1"
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -25,10 +25,12 @@ def _install_theme() -> None:
     st.markdown(
         """
         <style>
-        .stApp { background: linear-gradient(180deg,#f8f6f0 0%,#fff 40%); }
+        .stApp { background:#fff; }
         .block-container { max-width: 1280px; padding-top: 2rem; padding-bottom: 4rem; }
-        .cs-hero { padding:.5rem 0 1.4rem; border-bottom:1px solid #ddd7ca; }
-        .cs-kicker { color:#8b5a2b; letter-spacing:.14em; font-weight:800; font-size:.72rem; }
+        .cs-hero { background:#f8f6f0; padding:1rem 1.25rem 1.4rem;
+                   border:1px solid #e5ded2; border-radius:16px; }
+        .cs-kicker { color:#8b5a2b; letter-spacing:.14em; font-weight:800; font-size:.72rem;
+                     line-height:1.5; padding:.08rem 0; }
         .cs-hero h1 { font-family:Georgia,serif; font-size:3.2rem; letter-spacing:-.045em;
                       color:#19231f; margin:.2rem 0; }
         .cs-hero p { color:#56605b; font-size:1.13rem; max-width:850px; margin:.25rem 0; }
@@ -173,6 +175,52 @@ def _answer_widget(question: Question) -> Any:
     )
 
 
+def _format_inr(value: float) -> str:
+    """Format a numeric amount with Indian digit grouping."""
+    rounded = round(value)
+    sign = "-" if rounded < 0 else ""
+    digits = str(abs(rounded))
+    if len(digits) <= 3:
+        grouped = digits
+    else:
+        tail = digits[-3:]
+        head = digits[:-3]
+        groups: list[str] = []
+        while head:
+            groups.append(head[-2:])
+            head = head[:-2]
+        grouped = f"{','.join(reversed(groups))},{tail}"
+    return f"{sign}₹{grouped}"
+
+
+def _display_label(key: str) -> str:
+    """Turn an internal metric key into a concise UI label."""
+    return key.replace("_", " ").replace("₹", "").replace("%", "").strip().capitalize()
+
+
+def _display_value(key: str, value: Any) -> str:
+    """Format structured values without leaking JSON notation into the UI."""
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    if isinstance(value, (int, float)):
+        if "₹" in key:
+            return _format_inr(float(value))
+        if "%" in key:
+            return f"{float(value):,.1f}%"
+        return f"{float(value):,.0f}" if float(value).is_integer() else f"{float(value):,.1f}"
+    if isinstance(value, (list, tuple)):
+        return " · ".join(str(item) for item in value)
+    return str(value)
+
+
+def _display_rows(values: dict[str, Any]) -> list[dict[str, str]]:
+    """Create two-column presentation rows for a structured mapping."""
+    return [
+        {"Metric": _display_label(key), "Value": _display_value(key, value)}
+        for key, value in values.items()
+    ]
+
+
 def _render_consultant(product_id: str, service: DecisionStudio) -> None:
     state = _consultation(product_id)
     questions = service.questions(product_id)
@@ -256,7 +304,9 @@ def _render_option(option: Any, rank: int) -> None:
             st.markdown(f"- {reason}")
         if option.metrics:
             with st.expander("Numbers behind this option"):
-                st.json(option.metrics)
+                st.dataframe(
+                    _display_rows(option.metrics), width="stretch", hide_index=True
+                )
         with st.expander("Risks and evidence"):
             st.markdown("**Risks**")
             for risk in option.risks:
@@ -380,7 +430,7 @@ def _render_knowledge(product_id: str) -> None:
     cols[3].metric("Schema", manifest["schema_version"])
     st.dataframe(rows, width="stretch", hide_index=True)
     with st.expander("Artifact identity"):
-        st.json(manifest)
+        st.dataframe(_display_rows(manifest), width="stretch", hide_index=True)
 
 
 def _workspace(product_id: str) -> None:
