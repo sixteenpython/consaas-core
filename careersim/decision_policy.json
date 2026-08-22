@@ -1,0 +1,6 @@
+{
+  "policy_version": "0.1.0",
+  "weights": {"field_fit": 0.18, "degree_fit": 0.10, "affordability": 0.22, "quality": 0.16, "employability": 0.18, "salary_value": 0.10, "risk_fit": 0.06},
+  "verdict_thresholds": {"strong": 72, "conditional": 56},
+  "minimum_options": 2
+}

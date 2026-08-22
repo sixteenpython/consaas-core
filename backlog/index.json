@@ -6,6 +6,8 @@
     {"id": "NARRATIVE-002-T01", "kind": "task", "status": "READY", "depends_on": ["NARRATIVE-001-T01"]},
     {"id": "NARRATIVE-003", "kind": "feature", "status": "BACKLOG", "depends_on": ["NARRATIVE-002-T01"]},
     {"id": "NARRATIVE-004", "kind": "feature", "status": "REVIEW", "depends_on": ["NARRATIVE-001-T01"]},
-    {"id": "NARRATIVE-004-T01", "kind": "task", "status": "REVIEW", "depends_on": ["NARRATIVE-001-T01"]}
+    {"id": "NARRATIVE-004-T01", "kind": "task", "status": "REVIEW", "depends_on": ["NARRATIVE-001-T01"]},
+    {"id": "CORE-001", "kind": "feature", "status": "REVIEW", "depends_on": []},
+    {"id": "CORE-001-T01", "kind": "task", "status": "REVIEW", "depends_on": []}
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {"source_id": "careersim_foundation_curated", "publisher": "ConSaaS", "mode": "curated_snapshot", "url": "careersim/data/seed.csv", "license": "project-authored synthesis", "cadence": "monthly review"},
+    {"source_id": "nirf_2025", "publisher": "Ministry of Education, Government of India", "mode": "reference_only", "url": "https://www.nirfindia.org/Rankings/2025/Ranking.html", "license": "official public information; verify reuse terms", "cadence": "annual"},
+    {"source_id": "aishe_2023_24", "publisher": "Ministry of Education, Government of India", "mode": "reference_only", "url": "https://aishe.gov.in/documents/", "license": "official public information; verify reuse terms", "cadence": "annual"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "questions": [
+    {"id": "role", "prompt": "From which seat are you making this decision?", "type": "choice", "options": ["Founder", "Investor"]},
+    {"id": "stage", "prompt": "What is the venture's current stage?", "type": "choice", "options": ["Ideation", "Validation", "Early traction", "Scaling"]},
+    {"id": "sector", "prompt": "Which sector best describes the venture?", "type": "choice", "options": ["Enterprise software", "Consumer internet", "Fintech", "Healthcare / life sciences", "Climate / industrial", "Education / skilling"]},
+    {"id": "monthly_revenue_inr", "prompt": "What is current monthly recurring or repeatable revenue?", "type": "number", "min": 0, "max": 100000000, "step": 50000, "default": 500000},
+    {"id": "monthly_growth_pct", "prompt": "What is the recent monthly revenue or active-customer growth rate?", "type": "number", "min": -50, "max": 200, "step": 1, "default": 8},
+    {"id": "retention_pct", "prompt": "What percentage of customers or users remain active after the relevant repeat period?", "type": "number", "min": 0, "max": 100, "step": 1, "default": 65},
+    {"id": "gross_margin_pct", "prompt": "What is gross margin after direct delivery costs?", "type": "number", "min": -100, "max": 100, "step": 1, "default": 55},
+    {"id": "runway_months", "prompt": "How many months of runway remain at the present burn?", "type": "number", "min": 0, "max": 60, "step": 1, "default": 12},
+    {"id": "customer_evidence", "prompt": "How strong is evidence that customers urgently need this?", "type": "choice", "options": ["Repeated paid use", "Paid pilots", "Active usage but little payment", "Interviews / assertion only"]},
+    {"id": "team_strength", "prompt": "How complete is the team for the next 18 months?", "type": "choice", "options": ["Complete and proven", "Strong with one key gap", "Several critical gaps", "Founder-dependent"]},
+    {"id": "regulatory_risk", "prompt": "How material is regulatory or compliance uncertainty?", "type": "choice", "options": ["Low", "Manageable", "Material", "Unclear"]}
+  ]
+}

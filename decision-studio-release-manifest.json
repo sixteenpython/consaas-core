@@ -1,0 +1,17 @@
+{
+  "release": "decision-studio-foundation-0.1.0",
+  "date": "2026-08-22",
+  "entrypoint": "streamlit_app.py",
+  "products": ["careersim", "housewise", "startup"],
+  "gka_schema": "0.1.0",
+  "policy_version": "0.1.0",
+  "profile": "anonymous-session-only",
+  "external_inference_required": false,
+  "hosted_narration": "optional-explicit-consent",
+  "limitations": [
+    "Foundation seed coverage is intentionally small",
+    "Reference-only official sources require operator review",
+    "No output is financial, legal, admission, valuation or investment advice"
+  ],
+  "rollback": "revert release commit or restore prior Streamlit entrypoint; GKA rollback uses promoted pointer"
+}

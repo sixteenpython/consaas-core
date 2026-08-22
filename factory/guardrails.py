@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-PRODUCTS = {"vriddhi", "narrative", "housewise", "careersim"}
+PRODUCTS = {"vriddhi", "narrative", "housewise", "careersim", "startup"}
 MODULE_ROOTS = PRODUCTS | {"core", "factory"}
 FORBIDDEN_PROVIDER_IMPORTS = {"openai", "anthropic", "google.generativeai", "ollama"}
 IMPORT_RE = re.compile(r"^\s*(?:from|import)\s+([a-zA-Z_][\w.]*)", re.MULTILINE)

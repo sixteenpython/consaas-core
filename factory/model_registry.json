@@ -20,7 +20,16 @@
       "minimum_ram_gb": 24,
       "context_tokens": 131072,
       "enabled": true
+    },
+    {
+      "model_id": "gpt-oss-20b-groq",
+      "runtime_name": "openai/gpt-oss-20b",
+      "provider": "groq",
+      "license": "Apache-2.0",
+      "capabilities": ["conversation", "recommendation"],
+      "minimum_ram_gb": 0,
+      "context_tokens": 131072,
+      "enabled": true
     }
   ]
 }
-

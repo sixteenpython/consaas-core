@@ -82,4 +82,7 @@ Lower levels implement higher levels. When authorities conflict, stop and resolv
 
 ## Portfolio boundary
 
-The current portfolio is Vriddhi (live), Narrative Architect (architecture complete/implementation starting), HouseWise (planned), and CareerSim (planned). Additional products require an explicit portfolio decision.
+The current portfolio is Vriddhi (live), Narrative Architect (Foundation Alpha), HouseWise
+(Foundation MVP), CareerSim (Foundation MVP), and StartupEval (Foundation MVP). StartupEval and the
+three-product Decision Studio were explicitly approved on 2026-08-22 and recorded in ADR-CORE-001.
+Additional products require an explicit portfolio decision.

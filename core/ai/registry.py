@@ -68,8 +68,8 @@ class ModelRegistry:
         }
         if set(item) != required:
             raise ModelRegistryError(f"registry entry keys must be exactly {sorted(required)}")
-        if item["provider"] != "ollama":
-            raise ModelRegistryError("MVP permits only the local Ollama provider")
+        if item["provider"] not in {"ollama", "groq"}:
+            raise ModelRegistryError("provider is not approved by the Foundation model policy")
         if not item["license"]:
             raise ModelRegistryError("every model requires a documented license")
 
@@ -78,6 +78,7 @@ class ModelRegistry:
             model
             for model in self._models
             if model.enabled
+            and model.provider == "ollama"
             and capability in model.capabilities
             and model.minimum_ram_gb <= available_ram_gb
         ]
@@ -86,3 +87,14 @@ class ModelRegistry:
                 f"no enabled local model supports {capability!r} within {available_ram_gb} GB"
             )
         return max(candidates, key=lambda model: (model.context_tokens, model.minimum_ram_gb))
+
+    def resolve_hosted(self, capability: str) -> ModelDefinition:
+        """Resolve an explicitly requested hosted-demo model."""
+        candidates = [
+            model
+            for model in self._models
+            if model.enabled and model.provider == "groq" and capability in model.capabilities
+        ]
+        if not candidates:
+            raise ModelRegistryError(f"no enabled hosted model supports {capability!r}")
+        return max(candidates, key=lambda model: model.context_tokens)

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "questions": [
+    {"id": "city", "prompt": "Which city is the decision centred on?", "type": "choice", "options": ["Bengaluru", "Mumbai", "Pune", "Hyderabad", "Chennai", "Delhi NCR", "Kolkata"]},
+    {"id": "purpose", "prompt": "What job must this property perform?", "type": "choice", "options": ["Primary home", "Long-term investment", "Both home and investment"]},
+    {"id": "budget_inr", "prompt": "What is your all-in purchase ceiling, including taxes and transaction costs?", "type": "number", "min": 2000000, "max": 100000000, "step": 500000, "default": 12000000},
+    {"id": "size_sqft", "prompt": "What approximate usable size do you need?", "type": "number", "min": 400, "max": 4000, "step": 100, "default": 1000},
+    {"id": "horizon_years", "prompt": "How long can you realistically hold the property?", "type": "number", "min": 1, "max": 30, "step": 1, "default": 8},
+    {"id": "financing", "prompt": "How stretched would the purchase leave your household?", "type": "choice", "options": ["Comfortable buffer", "Manageable", "Stretched"]},
+    {"id": "priority", "prompt": "Which quality matters most?", "type": "choice", "options": ["Daily liveability", "Capital preservation", "Rental income", "Growth potential", "Liquidity"]},
+    {"id": "risk_tolerance", "prompt": "How much execution, climate and resale uncertainty can you accept?", "type": "choice", "options": ["Low", "Moderate", "High"]}
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "policy_version": "0.1.0",
+  "weights": {"traction": 0.16, "growth": 0.12, "retention": 0.16, "margin": 0.10, "runway": 0.14, "customer_evidence": 0.14, "team": 0.10, "regulatory_resilience": 0.08},
+  "verdict_thresholds": {"strong": 72, "conditional": 54},
+  "minimum_runway_months": 6
+}

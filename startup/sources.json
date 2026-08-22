@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {"source_id": "startup_foundation_curated", "publisher": "ConSaaS", "mode": "curated_snapshot", "url": "startup/data/seed.csv", "license": "project-authored methodology benchmark", "cadence": "monthly review"},
+    {"source_id": "startup_india_map", "publisher": "DPIIT / Startup India", "mode": "reference_only", "url": "https://www.startupindia.gov.in/digital-map/maps/view-insight?id=India&state=India", "license": "official public information; verify reuse terms", "cadence": "monthly"},
+    {"source_id": "startup_states_5", "publisher": "DPIIT / Startup India", "mode": "reference_only", "url": "https://www.startupindia.gov.in/srf/portal/edition_5th_2026.html", "license": "official public information; verify reuse terms", "cadence": "periodic"}
+  ]
+}

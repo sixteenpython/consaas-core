@@ -1,0 +1,11 @@
+record_id,option_name,city,indicative_price_per_sqft,rental_yield_pct,liveability_score,liquidity_score,transit_score,growth_score,risk_score,source_id,source_url,observed_on,confidence,notes
+house-001,Established transit-connected corridor,Bengaluru,14500,3.2,84,85,88,72,36,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Illustrative city archetype not a property valuation
+house-002,Emerging peripheral technology corridor,Bengaluru,8500,3.5,67,65,58,84,57,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Infrastructure completion and water risk require project-level verification
+house-003,Established suburban rail corridor,Mumbai,24000,2.8,78,88,86,68,42,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Indicative archetype; society title and redevelopment exposure vary
+house-004,Peripheral growth node,Mumbai,13500,3.1,63,62,55,82,60,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Commute and delivery risk can dominate apparent affordability
+house-005,Established employment corridor,Pune,10500,3.4,80,78,76,75,38,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Illustrative city archetype
+house-006,Emerging ring-road corridor,Hyderabad,8200,3.3,69,70,65,83,51,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Verify supply pipeline and infrastructure delivery
+house-007,Established southern employment corridor,Chennai,9800,3.0,79,75,72,70,40,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Flood and water risk require site-level checks
+house-008,Metro-linked established suburb,Delhi NCR,12500,3.1,76,80,85,71,48,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Jurisdiction and developer delivery record require verification
+house-009,Affordable peripheral growth cluster,Delhi NCR,7200,3.6,61,58,52,80,64,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,High execution and resale uncertainty
+house-010,Established metro-access neighbourhood,Kolkata,7800,3.4,77,72,80,62,37,housewise_foundation_curated,https://residex.nhbonline.org.in/,2026-08-22,low,Illustrative city archetype

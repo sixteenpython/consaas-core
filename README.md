@@ -2,6 +2,27 @@
 
 ConSaaS Core is the operating system for explainable Decision Intelligence products. It extracts the reusable architecture proven by Vriddhi so that new products are assembled from domain plugins instead of rebuilt as independent applications.
 
+## Decision Studio Foundation
+
+The root Streamlit application now contains three bounded, runnable Decision Intelligence journeys:
+
+- **CareerSim** for higher-education investment decisions;
+- **HouseWise** for Indian residential purchase decisions;
+- **StartupEval** for founder and investor venture assessment.
+
+Each journey uses a canonical session-only decision brief, a promoted `GKA v0.1 Foundation`, a
+versioned deterministic policy, explainable recommendations and optional validated open-model
+narration. Run it with `streamlit run streamlit_app.py`.
+
+Refresh all three promoted knowledge assets with:
+
+```powershell
+python refresh_monthly.py --effective-date YYYY-MM-DD
+```
+
+See [Decision Studio architecture](./docs/DECISION_STUDIO_FOUNDATION.md) and the
+[monthly operations runbook](./docs/DECISION_STUDIO_OPERATIONS.md).
+
 ## Product contract
 
 A product supplies only:

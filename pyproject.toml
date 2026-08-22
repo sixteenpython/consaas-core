@@ -21,7 +21,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["core*", "factory*"]
+include = ["core*", "factory*", "plugin_sdk*", "decision_studio*", "careersim*", "housewise*", "startup*"]
 
 [tool.pytest.ini_options]
 pythonpath = [".", "narrative/src"]
@@ -40,6 +40,7 @@ select = ["E", "F", "I", "B", "UP", "S"]
 "tests/**/*.py" = ["S101"]
 "narrative/tests/**/*.py" = ["S101"]
 "core/ai/adapters/ollama.py" = ["S310"]
+"core/ai/adapters/groq.py" = ["S310"]
 
 [tool.mypy]
 python_version = "3.12"

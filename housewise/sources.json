@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {"source_id": "housewise_foundation_curated", "publisher": "ConSaaS", "mode": "curated_snapshot", "url": "housewise/data/seed.csv", "license": "project-authored synthesis", "cadence": "monthly review"},
+    {"source_id": "nhb_residex", "publisher": "National Housing Bank", "mode": "reference_only", "url": "https://residex.nhbonline.org.in/", "license": "official public information; verify reuse terms", "cadence": "quarterly"},
+    {"source_id": "rbi_hpi", "publisher": "Reserve Bank of India", "mode": "reference_only", "url": "https://data.rbi.org.in/", "license": "official public information; verify reuse terms", "cadence": "quarterly"}
+  ]
+}

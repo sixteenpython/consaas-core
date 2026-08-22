@@ -1,0 +1,6 @@
+{
+  "schema_version": "0.1.0",
+  "methodology_version": "0.1.0",
+  "required_columns": ["record_id", "option_name", "city", "indicative_price_per_sqft", "rental_yield_pct", "liveability_score", "liquidity_score", "transit_score", "growth_score", "risk_score", "source_id", "source_url", "observed_on", "confidence"],
+  "numeric_columns": ["indicative_price_per_sqft", "rental_yield_pct", "liveability_score", "liquidity_score", "transit_score", "growth_score", "risk_score"]
+}

@@ -21,19 +21,22 @@
   "products": [
     {"id": "vriddhi", "status": "live", "owner": "product-owner"},
     {"id": "narrative", "status": "foundation-alpha-review", "owner": "product-owner"},
-    {"id": "housewise", "status": "planned", "owner": "product-owner"},
-    {"id": "careersim", "status": "planned", "owner": "product-owner"}
+    {"id": "housewise", "status": "foundation-mvp-review", "owner": "product-owner"},
+    {"id": "careersim", "status": "foundation-mvp-review", "owner": "product-owner"},
+    {"id": "startup", "status": "foundation-mvp-review", "owner": "product-owner"}
   ],
   "tasks": {
     "NARRATIVE-001-T01": {"status": "review", "tests": 7, "evaluation_cases": 3},
     "NARRATIVE-002-T01": {"status": "ready", "tests": 0, "evaluation_cases": 0},
-    "NARRATIVE-004-T01": {"status": "review", "tests": 15, "evaluation_cases": 0}
+    "NARRATIVE-004-T01": {"status": "review", "tests": 15, "evaluation_cases": 0},
+    "CORE-001-T01": {"status": "review", "tests": 9, "evaluation_cases": 3}
   },
   "blockers": ["authoritative GitLab remote and runner are not configured"],
   "milestones": [
     {"id": "factory-bootstrap", "status": "review"},
     {"id": "narrative-foundation-alpha", "status": "review"},
-    {"id": "narrative-vertical-slice-1", "status": "not-started"}
+    {"id": "narrative-vertical-slice-1", "status": "not-started"},
+    {"id": "decision-studio-foundation", "status": "review"}
   ],
   "next_ready_task": "NARRATIVE-002-T01"
 }

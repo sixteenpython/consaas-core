@@ -1,0 +1,7 @@
+{
+  "policy_version": "0.1.0",
+  "weights": {"affordability": 0.28, "liveability": 0.16, "liquidity": 0.14, "transit": 0.10, "rental_yield": 0.10, "growth": 0.12, "risk_fit": 0.10},
+  "verdict_thresholds": {"strong": 72, "conditional": 55},
+  "transaction_cost_buffer": 0.08,
+  "minimum_horizon_years": 5
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": "0.1.0",
+  "methodology_version": "0.1.0",
+  "required_columns": ["record_id", "option_name", "degree_level", "field", "geography", "total_cost_inr", "quality_score", "employability_score", "median_start_salary_inr", "risk_score", "source_id", "source_url", "observed_on", "confidence"],
+  "numeric_columns": ["total_cost_inr", "quality_score", "employability_score", "median_start_salary_inr", "risk_score"]
+}

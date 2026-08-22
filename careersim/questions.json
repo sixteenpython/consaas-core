@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "questions": [
+    {"id": "degree_level", "prompt": "Which education decision are you making?", "type": "choice", "options": ["Undergraduate", "Postgraduate", "Professional / upskilling"]},
+    {"id": "field", "prompt": "Which broad field should this investment serve?", "type": "choice", "options": ["Engineering / technology", "Business / management", "Data / AI", "Healthcare / life sciences", "Flexible / undecided"]},
+    {"id": "budget_inr", "prompt": "What is the maximum total amount you can responsibly invest, including living costs?", "type": "number", "min": 200000, "max": 20000000, "step": 100000, "default": 2000000},
+    {"id": "geography", "prompt": "Where are you genuinely willing to study?", "type": "choice", "options": ["India only", "India or overseas", "Overseas preferred"]},
+    {"id": "academic_readiness", "prompt": "How competitive is your present academic profile for your target?", "type": "choice", "options": ["Strong", "Competitive", "Developing"]},
+    {"id": "priority", "prompt": "What must this decision optimise above everything else?", "type": "choice", "options": ["Career outcomes", "Low debt", "Academic depth", "International mobility", "Optionality"]},
+    {"id": "risk_tolerance", "prompt": "How much admission, debt and outcome uncertainty can you accept?", "type": "choice", "options": ["Low", "Moderate", "High"]}
+  ]
+}

@@ -1,0 +1,13 @@
+record_id,sector,stage,revenue_reference_inr,growth_reference_pct,retention_reference_pct,gross_margin_reference_pct,runway_reference_months,regulatory_complexity,source_id,source_url,observed_on,confidence,notes
+startup-001,Enterprise software,Ideation,0,0,0,75,12,25,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Methodology benchmark not a population statistic
+startup-002,Enterprise software,Validation,200000,8,60,75,12,25,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Stage-adjusted illustrative reference
+startup-003,Enterprise software,Early traction,1200000,12,80,78,15,25,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Stage-adjusted illustrative reference
+startup-004,Consumer internet,Validation,100000,15,35,55,12,30,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Retention period must match product frequency
+startup-005,Consumer internet,Early traction,1000000,18,45,60,15,30,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Methodology benchmark not a valuation input
+startup-006,Fintech,Validation,250000,10,60,65,15,80,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Regulatory permissions and partner dependencies dominate
+startup-007,Fintech,Early traction,1500000,12,75,70,18,80,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Compliance evidence required
+startup-008,Healthcare / life sciences,Validation,150000,6,70,55,18,85,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Clinical and regulatory pathway must be separately diligenced
+startup-009,Climate / industrial,Early traction,1800000,8,75,38,18,60,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Long sales cycles and working capital change metric interpretation
+startup-010,Education / skilling,Validation,150000,8,50,62,12,35,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Outcome evidence and repeat purchase matter
+startup-011,Education / skilling,Early traction,900000,10,65,68,15,35,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Institutional versus consumer motion should be assessed separately
+startup-012,Enterprise software,Scaling,8000000,10,88,80,20,25,startup_foundation_curated,https://www.startupindia.gov.in/,2026-08-22,low,Scaling reference requires cohort and concentration diligence
