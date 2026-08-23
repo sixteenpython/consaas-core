@@ -72,6 +72,17 @@ def test_every_consultant_completes_without_model_inference(
             button for button in app.button if button.label == "Preserve answer and continue"
         ]
         assert buttons
+        if product_id == "startup":
+            next(
+                area for area in app.text_area if str(area.key).startswith("answer-startup-")
+            ).set_value(
+                "We observed 20 customers, tested a paid pilot, measured repeat usage and changed "
+                "the product after evidence. The next 8-week milestone has a ₹2 lakh budget and "
+                "a defined pass or fail threshold."
+            ).run(timeout=30)
+            buttons = [
+                button for button in app.button if button.label == "Preserve answer and continue"
+            ]
         buttons[-1].click().run(timeout=30)
         assert not app.exception
     assert app.session_state["consultations"][product_id]["report"] is not None

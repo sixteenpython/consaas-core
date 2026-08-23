@@ -12,6 +12,8 @@
     {"id": "CORE-002", "kind": "feature", "status": "REVIEW", "depends_on": ["CORE-001"]},
     {"id": "CORE-002-T01", "kind": "task", "status": "REVIEW", "depends_on": ["CORE-001-T01"]},
     {"id": "CORE-003", "kind": "feature", "status": "REVIEW", "depends_on": ["CORE-002"]},
-    {"id": "CORE-003-T01", "kind": "task", "status": "REVIEW", "depends_on": ["CORE-002-T01"]}
+    {"id": "CORE-003-T01", "kind": "task", "status": "REVIEW", "depends_on": ["CORE-002-T01"]},
+    {"id": "CORE-004", "kind": "feature", "status": "REVIEW", "depends_on": ["CORE-003"]},
+    {"id": "CORE-004-T01", "kind": "task", "status": "REVIEW", "depends_on": ["CORE-003-T01"]}
   ]
 }

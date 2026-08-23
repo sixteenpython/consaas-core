@@ -32,6 +32,16 @@ def test_natural_choice_is_coerced_without_model_inference() -> None:
     }
 
 
+def test_natural_language_answer_is_preserved_for_text_question() -> None:
+    question = Question("evidence", "What did you observe?", "text")
+    wording = "We interviewed 20 customers and 8 completed a paid pilot."
+
+    action = deterministic_action(wording, question)
+
+    assert action.intent == "answer"
+    assert action.value == wording
+
+
 @pytest.mark.parametrize(
     ("message", "intent"),
     [

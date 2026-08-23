@@ -1,6 +1,6 @@
 {
-  "policy_version":"0.2.0",
-  "weights":{"field_fit":0.10,"degree_fit":0.10,"destination_fit":0.08,"affordability":0.16,"quality":0.10,"employability":0.13,"salary_value":0.12,"work_rights":0.07,"funding_fit":0.08,"risk_fit":0.06},
-  "verdict_thresholds":{"strong":74,"conditional":58},
+  "policy_version":"1.0.0",
+  "method":"scenario_cashflow_pareto_robust_rank",
+  "verdict_thresholds":{"strong":70,"conditional":55},
   "minimum_options":2
 }

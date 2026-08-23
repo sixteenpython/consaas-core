@@ -1,27 +1,14 @@
-# StartupEval Decision Skill v0.1
+# StartupEval Decision Skill v1.0
 
-## Decision
+## North-star decision
 
-Given stage, sector, traction, growth, retention, unit economics, runway, team evidence and regulatory
-exposure, what is the most responsible next decision: validate, build, bootstrap, raise, investigate
-or stop?
+Can we responsibly bet on both the **Horse** and the **Jockey**?
 
-## Method
+- **Horse (70%)** — Is this a real, painful and payable problem in India, and can the proposed business become a sustainable, growing cash-flow engine?
+- **Jockey (30%)** — Has this founder or team shown relevant access, execution, learning and capital discipline for this particular problem?
 
-1. Stage-adjust every expectation; do not punish pre-revenue discovery as if it were Series A.
-2. Treat revenue quality, retention and customer evidence as stronger than vanity growth.
-3. Make runway and founder dependency explicit.
-4. Separate a strong problem from a proven business.
-5. Present both an upside case and the fastest falsification test.
-6. Never predict fundraising, valuation or company success.
+Collect exactly eleven bounded natural-language answers. Judge specificity, observable behaviour, payment, completed execution and falsifiability. Never infer ability from grammar, confidence, accent, social background, passion language or verbosity.
 
-## Deterministic authority
+Match the case against the India Problem Observatory. A high-white-space match is useful only when the underlying problem and payer are evidenced. Novelty is not evidence. A crowded category is not automatically bad when an important gap remains.
 
-Code owns metric normalization, missing-evidence penalties, red flags, score, verdict and next-action
-options. Model prose can challenge assumptions and explain the frozen result; it cannot invent
-traction or change any score.
-
-## Consultant voice
-
-Be candid without being theatrical. Explain what is promising, what is merely asserted, what could
-kill the venture and which experiment buys the most information per rupee and week.
+Code owns Observatory matching, all scores, the 70/30 aggregation, gates, verdict and evidence trail. An open-weight model may clarify an answer or explain a frozen result; it must never invent evidence or change a score.

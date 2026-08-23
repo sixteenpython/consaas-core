@@ -1,20 +1,19 @@
 {
-  "release": "decision-studio-conversational-intelligence-0.3.0",
+  "release": "decision-studio-domain-intelligence-0.4.0",
   "date": "2026-08-23",
   "entrypoint": "streamlit_app.py",
   "products": ["careersim", "housewise", "startup"],
-  "gka_schema": "product-versioned with decision metric catalogs",
-  "policy_version": "product-versioned; CareerSim 0.2.0",
+  "knowledge_release_tag": "decision-intelligence-v1",
+  "policy_versions": {"careersim": "1.0.0", "housewise": "1.0.0", "startup": "1.0.0"},
   "profile": "anonymous-session-only",
   "external_inference_required": false,
-  "browser_inference": "optional WebGPU; Apache-2.0 SmolLM2-1.7B; typed validation required",
-  "hosted_narration": "optional-explicit-consent",
+  "browser_inference": "optional WebGPU open-weight model; typed validation required",
   "limitations": [
-    "Available observations remain illustrative and are not exhaustive",
-    "Reference-only official sources require operator review",
-    "Browser inference quality and availability depend on the user device",
-    "The browser runtime is pinned but loaded from a third-party CDN in this bounded release",
-    "No output is financial, legal, admission, valuation or investment advice"
+    "Knowledge coverage is curated and bounded rather than exhaustive",
+    "Education paths require programme-offer and policy verification",
+    "Property paths require legal, approval and technical diligence",
+    "Startup answers remain self-reported until primary evidence is verified",
+    "Forecasts are scenarios and no output is a guarantee or regulated advice"
   ],
-  "rollback": "revert release commit or restore prior Streamlit entrypoint; GKA rollback uses promoted pointer"
+  "rollback": "revert the release commit and restore the prior immutable GKA current pointers"
 }

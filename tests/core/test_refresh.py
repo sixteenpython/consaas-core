@@ -47,3 +47,15 @@ def test_invalid_candidate_does_not_replace_current_release(tmp_path: Path) -> N
         refresh_product(root, "careersim", date(2026, 9, 22))
 
     assert pointer_path.read_bytes() == before
+
+
+def test_tagged_methodology_release_preserves_same_day_history(tmp_path: Path) -> None:
+    root = _workspace(tmp_path)
+    effective = date(2026, 8, 23)
+    baseline = refresh_product(root, "careersim", effective)
+    tagged = refresh_product(root, "careersim", effective, "decision-intelligence-v1")
+
+    assert baseline.release_dir.exists()
+    assert tagged.release_dir.name == "2026-08-23-decision-intelligence-v1"
+    assert (tagged.release_dir / "source_catalog.json").exists()
+    assert (tagged.release_dir / "validation_report.json").exists()

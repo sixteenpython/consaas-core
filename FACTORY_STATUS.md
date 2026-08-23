@@ -12,13 +12,16 @@
 - Dependency-ordered backlog and one end-to-end Narrative implementation demonstration
 - Decision Studio v0.3 free-form consultation, epistemic Case Knowledge, a live Decision Position,
   and optional provider-free browser inference behind a typed validation gate
+- Decision Studio v0.4 scenario/Pareto education and property engines, India Problem Observatory,
+  and deterministic 70/30 Horse/Jockey startup adjudication
 
 ## Deliberate limits
 
 - Narrative Architect now has a deployable deterministic Foundation Alpha for Create mode. It is
   deliberately smaller than Vertical Slice 1: local LLM proposals, durable SQLite storage,
   screenplay PDF output, full NKA v1, and Doctor mode remain unbuilt.
-- HouseWise and CareerSim remain product envelopes, not applications.
+- CareerSim and HouseWise are bounded Foundation applications; exact programme and property
+  diligence connectors remain future work.
 - Vriddhi has not been rewritten or moved.
 - No Core abstraction is promoted solely from one product.
 - No GitLab pipeline or merge request is claimed: the configured repository currently has only a GitHub remote.

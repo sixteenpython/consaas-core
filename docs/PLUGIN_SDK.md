@@ -10,24 +10,37 @@ class DataConnector(Protocol):
     def acquire(self, plan: SourcePlan, ctx: RunContext) -> Artifact[SourceSnapshot]: ...
     def validate(self, artifact: Artifact[SourceSnapshot], ctx: RunContext) -> ValidationResult: ...
 
+
 class GoldenAssetBuilder(Protocol):
     def build(self, sources: Sequence[Artifact], ctx: RunContext) -> Artifact[GoldenAsset]: ...
 
+
 class Distiller(Protocol):
-    def distill(self, asset: Artifact[GoldenAsset], request: DecisionRequest,
-                ctx: RunContext) -> Artifact[DecisionView]: ...
+    def distill(
+        self, asset: Artifact[GoldenAsset], request: DecisionRequest, ctx: RunContext
+    ) -> Artifact[DecisionView]: ...
+
 
 class DecisionEngine(Protocol):
-    def decide(self, view: Artifact[DecisionView], request: DecisionRequest,
-               ctx: RunContext) -> Artifact[DecisionResult]: ...
+    def decide(
+        self, view: Artifact[DecisionView], request: DecisionRequest, ctx: RunContext
+    ) -> Artifact[DecisionResult]: ...
+
 
 class RecommendationGenerator(Protocol):
-    def recommend(self, result: Artifact[DecisionResult], context: RecommendationContext,
-                  ctx: RunContext) -> Artifact[RecommendationSet]: ...
+    def recommend(
+        self, result: Artifact[DecisionResult], context: RecommendationContext, ctx: RunContext
+    ) -> Artifact[RecommendationSet]: ...
+
 
 class ReportGenerator(Protocol):
-    def compose(self, recommendations: Artifact[RecommendationSet],
-                evidence: EvidenceResolver, ctx: RunContext) -> Artifact[ReportBundle]: ...
+    def compose(
+        self,
+        recommendations: Artifact[RecommendationSet],
+        evidence: EvidenceResolver,
+        ctx: RunContext,
+    ) -> Artifact[ReportBundle]: ...
+
 
 class DashboardProvider(Protocol):
     def pages(self, report: Artifact[ReportBundle], ctx: ServingContext) -> Sequence[PageSpec]: ...

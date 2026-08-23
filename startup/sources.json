@@ -1,8 +1,20 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "sources": [
-    {"source_id": "startup_foundation_curated", "publisher": "ConSaaS", "mode": "curated_snapshot", "url": "startup/data/seed.csv", "license": "project-authored methodology benchmark", "cadence": "monthly review"},
-    {"source_id": "startup_india_map", "publisher": "DPIIT / Startup India", "mode": "reference_only", "url": "https://www.startupindia.gov.in/digital-map/maps/view-insight?id=India&state=India", "license": "official public information; verify reuse terms", "cadence": "monthly"},
-    {"source_id": "startup_states_5", "publisher": "DPIIT / Startup India", "mode": "reference_only", "url": "https://www.startupindia.gov.in/srf/portal/edition_5th_2026.html", "license": "official public information; verify reuse terms", "cadence": "periodic"}
+    {"source_id":"india_problem_synthesis","publisher":"ConSaaS","mode":"curated_snapshot","url":"startup/data/seed.csv","license":"project-authored problem taxonomy and scores; underlying references linked per row","cadence":"monthly review"},
+    {"source_id":"mospi_compendium","publisher":"MoSPI","mode":"reference_only","url":"https://www.mospi.gov.in/uploads/announcements/announcements_1769778908344_7ee8297b-535c-4256-b8c6-06c5b95f7685_Compendium_of_Datasets_and_Registries_in_India%2C_2025.pdf","license":"official public information; verify reuse terms","cadence":"annual"},
+    {"source_id":"mospi_education","publisher":"MoSPI NSS","mode":"reference_only","url":"https://www.mospi.gov.in/sites/default/files/national_data_bank/ndb-rpts.htm","license":"official public information; verify reuse terms","cadence":"survey release"},
+    {"source_id":"mospi_health","publisher":"MoSPI NSS","mode":"reference_only","url":"https://www.mospi.gov.in/sites/default/files/national_data_bank/ndb-rpts.htm","license":"official public information; verify reuse terms","cadence":"survey release"},
+    {"source_id":"mospi_agriculture","publisher":"MoSPI NSS","mode":"reference_only","url":"https://www.mospi.gov.in/sites/default/files/national_data_bank/ndb-rpts.htm","license":"official public information; verify reuse terms","cadence":"survey release"},
+    {"source_id":"mospi_housing","publisher":"MoSPI NSS","mode":"reference_only","url":"https://www.mospi.gov.in/sites/default/files/national_data_bank/ndb-rpts.htm","license":"official public information; verify reuse terms","cadence":"survey release"},
+    {"source_id":"plfs","publisher":"MoSPI","mode":"reference_only","url":"https://mospi.gov.in/uploads/publications_reports/publications_reports1780040415321_0624fb13-fb47-40bc-b470-7c7e9635c3ef_PLFS_2025_F_REV_29052026.pdf","license":"official public information; verify reuse terms","cadence":"annual"},
+    {"source_id":"asuse","publisher":"MoSPI","mode":"reference_only","url":"https://www.mospi.gov.in/press-release/press-release-reports-annual-survey-unincorporated-sector-enterprises-asuse","license":"official public information; verify reuse terms","cadence":"annual"},
+    {"source_id":"rbi","publisher":"Reserve Bank of India","mode":"reference_only","url":"https://data.rbi.org.in/","license":"official public information; verify reuse terms","cadence":"monthly"},
+    {"source_id":"nhb_residex","publisher":"National Housing Bank","mode":"reference_only","url":"https://residex.nhbonline.org.in/","license":"official public information; verify reuse terms","cadence":"quarterly"},
+    {"source_id":"data_gov","publisher":"Government of India","mode":"reference_only","url":"https://data.gov.in/","license":"dataset-specific terms apply","cadence":"monthly review"},
+    {"source_id":"msme","publisher":"Ministry of MSME","mode":"reference_only","url":"https://msme.gov.in/","license":"official public information; verify reuse terms","cadence":"annual"},
+    {"source_id":"lasi","publisher":"IIPS","mode":"reference_only","url":"https://www.iipsindia.ac.in/content/lasi-publications","license":"published public research; verify reuse terms","cadence":"survey release"},
+    {"source_id":"mospi_energy","publisher":"MoSPI","mode":"reference_only","url":"https://www.mospi.gov.in/","license":"official public information; verify reuse terms","cadence":"annual"},
+    {"source_id":"mospi_social","publisher":"MoSPI","mode":"reference_only","url":"https://www.mospi.gov.in/","license":"official public information; verify reuse terms","cadence":"survey release"}
   ]
 }

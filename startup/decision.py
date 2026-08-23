@@ -1,20 +1,136 @@
-"""Deterministic StartupEval Foundation decision engine."""
+"""Deterministic Horse/Jockey adjudication for StartupEval."""
 
 from __future__ import annotations
 
+import re
+from collections import Counter
 from typing import Any
 
+from core.optimization import bounded
 from plugin_sdk.decision import DecisionReport, ScoredOption
 
+_STOPWORDS = {
+    "about",
+    "after",
+    "also",
+    "because",
+    "being",
+    "from",
+    "have",
+    "into",
+    "more",
+    "our",
+    "that",
+    "their",
+    "there",
+    "these",
+    "they",
+    "this",
+    "those",
+    "through",
+    "user",
+    "users",
+    "very",
+    "what",
+    "when",
+    "where",
+    "which",
+    "will",
+    "with",
+}
+_EVIDENCE_WORDS = {
+    "observed",
+    "interviewed",
+    "paid",
+    "payment",
+    "pilot",
+    "renewed",
+    "retained",
+    "used",
+    "usage",
+    "revenue",
+    "customer",
+    "customers",
+    "tested",
+    "measured",
+    "transaction",
+    "transactions",
+    "conversion",
+    "cohort",
+    "contract",
+    "orders",
+}
+_EXECUTION_WORDS = {
+    "built",
+    "launched",
+    "sold",
+    "operated",
+    "shipped",
+    "managed",
+    "changed",
+    "learned",
+    "failed",
+    "improved",
+    "delivered",
+    "hired",
+    "designed",
+    "implemented",
+    "closed",
+}
+_UNCERTAINTY = {"unknown", "unsure", "guess", "believe", "hope", "probably", "maybe"}
 
-def _bounded(value: float) -> float:
-    return max(0.0, min(100.0, value))
+
+def _tokens(text: str) -> list[str]:
+    return [
+        token
+        for token in re.findall(r"[a-z0-9]+", text.casefold())
+        if len(token) > 2 and token not in _STOPWORDS
+    ]
 
 
-def _relative(actual: float, reference: float) -> float:
-    if reference <= 0:
-        return 75.0 if actual <= 0 else 100.0
-    return _bounded(actual / reference * 75)
+def _answer_quality(text: str, evidence_terms: set[str] | None = None) -> float:
+    """Score specificity and behavioural evidence, not polish or confidence."""
+    words = _tokens(text)
+    if not words:
+        return 0.0
+    length = min(35.0, len(set(words)) * 1.25)
+    numbers = min(18.0, len(re.findall(r"\b\d+(?:\.\d+)?%?\b", text)) * 6.0)
+    evidence = min(35.0, len(set(words) & (evidence_terms or _EVIDENCE_WORDS)) * 7.0)
+    structure = 12.0 if len(text.strip()) >= 100 else 6.0 if len(text.strip()) >= 45 else 0.0
+    penalty = min(20.0, len(set(words) & _UNCERTAINTY) * 5.0)
+    return bounded(length + numbers + evidence + structure - penalty)
+
+
+def _problem_match(
+    answers: dict[str, Any], rows: list[dict[str, str]]
+) -> tuple[dict[str, str], float]:
+    query = " ".join(
+        str(answers[key])
+        for key in (
+            "problem_customer",
+            "problem_evidence",
+            "problem_cost",
+            "current_alternatives",
+            "payer_evidence",
+            "solution_outcome",
+        )
+    )
+    query_counts = Counter(_tokens(query))
+    ranked: list[tuple[float, dict[str, str]]] = []
+    for row in rows:
+        reference = " ".join(
+            row.get(key, "")
+            for key in ("domain", "subdomain", "problem_statement", "keywords", "affected_segment")
+        )
+        reference_tokens = set(_tokens(reference))
+        overlap = sum(min(query_counts[token], 2) for token in reference_tokens)
+        coverage = overlap / max(5, min(20, len(reference_tokens)))
+        ranked.append((bounded(coverage * 100), row))
+    return max(ranked, key=lambda item: item[0])[1], max(ranked, key=lambda item: item[0])[0]
+
+
+def _weighted(values: dict[str, float], weights: dict[str, float]) -> float:
+    return sum(values[key] * weights[key] for key in weights)
 
 
 def decide(
@@ -23,152 +139,204 @@ def decide(
     policy: dict[str, Any],
     manifest: dict[str, Any],
 ) -> DecisionReport:
-    candidates = [
-        row
-        for row in rows
-        if row["sector"] == answers["sector"] and row["stage"] == answers["stage"]
-    ]
-    if not candidates:
-        candidates = [row for row in rows if row["stage"] == answers["stage"]]
-    benchmark = candidates[0] if candidates else rows[0]
-    evidence_score = {
-        "Repeated paid use": 100,
-        "Paid pilots": 78,
-        "Active usage but little payment": 55,
-        "Interviews / assertion only": 28,
-    }[answers["customer_evidence"]]
-    team_score = {
-        "Complete and proven": 95,
-        "Strong with one key gap": 76,
-        "Several critical gaps": 45,
-        "Founder-dependent": 28,
-    }[answers["team_strength"]]
-    regulatory_score = {
-        "Low": 92,
-        "Manageable": 72,
-        "Material": 38,
-        "Unclear": 25,
-    }[answers["regulatory_risk"]]
-    dimensions = {
-        "traction": _relative(
-            float(answers["monthly_revenue_inr"]), float(benchmark["revenue_reference_inr"])
+    texts = {key: str(value).strip() for key, value in answers.items()}
+    problem, match_score = _problem_match(texts, rows)
+    q = {key: _answer_quality(value) for key, value in texts.items()}
+    q["solution_outcome"] = _answer_quality(
+        texts["solution_outcome"],
+        {
+            "before",
+            "converts",
+            "deterministic",
+            "evidence",
+            "measurable",
+            "outcome",
+            "produces",
+            "reduces",
+            "runs",
+            "versioned",
+        },
+    )
+    q["business_economics"] = _answer_quality(
+        texts["business_economics"],
+        {
+            "acquire",
+            "charge",
+            "cost",
+            "gross",
+            "margin",
+            "price",
+            "repeat",
+            "retain",
+            "revenue",
+            "serve",
+            "subscription",
+        },
+    )
+    match_authority = bounded(match_score * 1.25)
+    horse = {
+        "problem reality": bounded(
+            0.45 * float(problem["problem_reality_score"])
+            + 0.35 * q["problem_evidence"]
+            + 0.20 * match_authority
         ),
-        "growth": _relative(
-            float(answers["monthly_growth_pct"]), float(benchmark["growth_reference_pct"])
+        "pain and frequency": bounded(
+            0.55 * float(problem["severity_score"]) + 0.45 * q["problem_cost"]
         ),
-        "retention": _relative(
-            float(answers["retention_pct"]), float(benchmark["retention_reference_pct"])
+        "willing payer": bounded(
+            0.45 * float(problem["willingness_to_pay_score"]) + 0.55 * q["payer_evidence"]
         ),
-        "margin": _relative(
-            float(answers["gross_margin_pct"]), float(benchmark["gross_margin_reference_pct"])
+        "remaining white space": bounded(
+            0.50 * float(problem["whitespace_score"])
+            + 0.30 * q["current_alternatives"]
+            + 0.20 * match_authority
         ),
-        "runway": _relative(
-            float(answers["runway_months"]), float(benchmark["runway_reference_months"])
+        "solution mechanism": q["solution_outcome"],
+        "behavioural traction": q["traction_evidence"],
+        "sustainable economics": q["business_economics"],
+    }
+    horse_score = round(_weighted(horse, policy["horse_dimensions"]), 1)
+    jockey = {
+        "founder-problem fit": _answer_quality(
+            texts["founder_fit"], _EXECUTION_WORDS | _EVIDENCE_WORDS
         ),
-        "customer_evidence": evidence_score,
-        "team": team_score,
-        "regulatory_resilience": _bounded(
-            regulatory_score - float(benchmark["regulatory_complexity"]) * 0.2
+        "execution evidence": _answer_quality(texts["execution_learning"], _EXECUTION_WORDS),
+        "learning discipline": bounded(
+            0.65
+            * _answer_quality(
+                texts["execution_learning"], {"changed", "learned", "failed", "tested", "evidence"}
+            )
+            + 0.35
+            * _answer_quality(
+                texts["risk_milestone"],
+                {"test", "measure", "threshold", "fail", "week", "month", "budget"},
+            )
+        ),
+        "capital discipline": _answer_quality(
+            texts["risk_milestone"],
+            {"budget", "capital", "cost", "week", "month", "threshold", "milestone"},
         ),
     }
-    score = round(
-        sum(dimensions[key] * float(weight) for key, weight in policy["weights"].items()), 1
+    jockey_score = round(_weighted(jockey, policy["jockey_dimensions"]), 1)
+    overall = round(0.70 * horse_score + 0.30 * jockey_score, 1)
+    evidence_gate = min(
+        horse["problem reality"], horse["willing payer"], horse["solution mechanism"]
     )
-    risks: list[str] = [benchmark["notes"]]
-    if float(answers["runway_months"]) < float(policy["minimum_runway_months"]):
-        score = round(max(0, score - 12), 1)
-        risks.append("Runway is below six months; financing risk can overwhelm product progress.")
-    if answers["customer_evidence"] == "Interviews / assertion only":
-        risks.append(
-            "The problem is asserted but not yet supported by behavioural or paid evidence."
-        )
-    if answers["regulatory_risk"] in {"Material", "Unclear"}:
-        risks.append("Regulatory uncertainty is a decision gate, not a footnote.")
     thresholds = policy["verdict_thresholds"]
-    if float(answers["runway_months"]) < 3:
-        verdict = "SURVIVAL FIRST — CUT BURN OR SECURE RUNWAY"
-        primary = "Stabilise runway"
-    elif score >= thresholds["strong"] and evidence_score >= 78:
-        verdict = "PROMISING — PROCEED TO DEEP DILIGENCE"
-        primary = "Prepare the next evidence-backed growth or funding decision"
-    elif score >= thresholds["conditional"]:
-        verdict = "CONDITIONAL — RUN THE FALSIFICATION TEST"
-        primary = "Resolve the weakest evidence before scaling spend"
+    if (
+        overall >= thresholds["strong"]
+        and horse_score >= policy["strong_gates"]["horse"]
+        and jockey_score >= policy["strong_gates"]["jockey"]
+        and evidence_gate >= policy["strong_gates"]["critical_evidence"]
+    ):
+        verdict = "STRONG"
+        summary = (
+            "The proposition is close enough to a real, payable Indian problem and the team "
+            "has supplied enough execution evidence to justify controlled investment and "
+            "deeper diligence."
+        )
+    elif overall >= thresholds["conditional"] and horse["problem reality"] >= 42:
+        verdict = "NOT QUITE THERE"
+        summary = (
+            "There is a credible proposition, but one or more decisive assumptions still need "
+            "behavioural evidence before material capital is committed."
+        )
     else:
-        verdict = "NOT READY — VALIDATE BEFORE COMMITTING MORE CAPITAL"
-        primary = "Return to problem and customer validation"
-    option_specs = (
-        (primary, score, "Best current action"),
+        verdict = "FORGET IT — IN ITS CURRENT FORM"
+        summary = (
+            "The present case does not yet establish a sufficiently real, payable problem and "
+            "executable business. This rejects the current evidence—not the founder or every "
+            "future version of the idea."
+        )
+    combined = {f"Horse · {key}": value for key, value in horse.items()} | {
+        f"Jockey · {key}": value for key, value in jockey.items()
+    }
+    weakest = min(combined, key=combined.get)
+    fatal_unknown = weakest.replace("Horse · ", "").replace("Jockey · ", "")
+    risks = (
+        f"Fatal unknown: {fatal_unknown} is the weakest supported dimension at "
+        f"{combined[weakest]:.0f}/100.",
+        f"Problem-observatory match is {match_score:.0f}/100; low semantic overlap limits "
+        "external-evidence authority.",
+        "All venture answers are self-reported and require primary-evidence diligence before "
+        "funding.",
+    )
+    action_specs = (
         (
-            "Bootstrap a narrower proof point",
-            _bounded(score + (8 if evidence_score < 78 else -4)),
+            "Proceed to controlled diligence"
+            if verdict == "STRONG"
+            else "Run the fatal-unknown experiment",
+            overall,
+            "Best current action",
+        ),
+        (
+            "Narrow the proposition around the strongest proven customer",
+            bounded(overall + 6 if horse["problem reality"] >= 60 else overall - 4),
             "Lower-capital alternative",
         ),
         (
-            "Pause scale and investigate the fatal unknown",
-            _bounded(100 - min(dimensions.values()) / 2),
+            "Pause scale and buy evidence before building more",
+            bounded(100 - combined[weakest] / 2),
             "Information-first alternative",
         ),
     )
-    weakest_dimension = min(dimensions, key=lambda name: dimensions[name])
+    metrics = {
+        "Horse (business model)": horse_score,
+        "Jockey (founder execution)": jockey_score,
+        "India problem match": round(match_score, 1),
+        "White-space evidence": round(horse["remaining white space"], 1),
+    }
+    evidence = (
+        f"{problem['source_id']} · {problem['record_id']} · observed {problem['observed_on']}",
+        problem["source_url"],
+        f"Matched India problem: {problem['problem_statement']}",
+    )
     options = tuple(
         ScoredOption(
             f"startup-action-{index}",
             title,
-            round(option_score, 1),
+            round(score, 1),
             fit,
             (
-                f"Overall evidence score is {score:.1f}/100.",
-                f"Weakest dimension is {weakest_dimension.replace('_', ' ')} at "
-                f"{dimensions[weakest_dimension]:.0f}/100.",
+                f"Horse score is {horse_score:.1f}/100 and owns 70% of the verdict.",
+                f"Jockey score is {jockey_score:.1f}/100 and owns 30% of the verdict.",
             ),
-            tuple(risks),
-            (
-                f"{benchmark['source_id']} · observed {benchmark['observed_on']}",
-                benchmark["source_url"],
-            ),
-            {key.replace("_", " "): round(value, 1) for key, value in dimensions.items()},
+            risks,
+            evidence,
+            metrics,
         )
-        for index, (title, option_score, fit) in enumerate(option_specs, start=1)
+        for index, (title, score, fit) in enumerate(action_specs, start=1)
     )
-    confidence = (
-        "Medium" if evidence_score >= 78 and answers["regulatory_risk"] != "Unclear" else "Low"
-    )
-    if answers["role"] == "Investor":
-        next_actions = (
-            "Verify revenue, cohorts, cash, cap table and customer concentration from primary "
-            "evidence.",
-            "Interview reference customers and test the weakest dimension independently.",
-            "Define diligence conditions before discussing valuation or commitment.",
-        )
-    else:
-        next_actions = (
-            "Verify revenue, cohort retention, cash and customer concentration from primary "
-            "evidence.",
-            "Run one time-boxed experiment against the weakest dimension.",
-            "Re-score after the experiment before increasing irreversible spend.",
-        )
+    confidence = "Medium" if match_score >= 35 and min(q.values()) >= 35 else "Low"
     return DecisionReport(
         "startup",
         verdict,
-        score,
+        overall,
         confidence,
-        "Self-reported metrics against a Foundation methodology benchmark",
-        "The verdict is a stage-adjusted evidence assessment, not a prediction of company "
-        "success or valuation.",
+        "Eleven founder responses plus a transparent India Problem Observatory match",
+        summary,
         options,
-        tuple(dict.fromkeys(risks)),
+        risks,
         (
-            "Metrics use consistent definitions and comparable periods.",
-            "Self-reported traction has not been independently audited.",
+            "Answer quality measures specificity, behavioural evidence and falsifiability—not "
+            "grammar, charisma or verbosity.",
+            "White-space evidence can strengthen a real problem; novelty alone cannot make a "
+            "weak problem investable.",
+            "The assessment is decision support, not a prediction of startup success or valuation.",
         ),
-        next_actions,
         (
-            "Audited retention or paid-use evidence can materially improve authority.",
-            "A credible regulatory pathway can remove a decision gate.",
-            "Runway below six months can reverse an otherwise positive verdict.",
+            f"Verify the matched problem evidence: {problem['remaining_gap']}",
+            f"Design a time-boxed test for {fatal_unknown} with a pre-committed success threshold.",
+            "Re-run the same eleven-question assessment after the test and compare the "
+            "versioned scores.",
         ),
-        (f"{benchmark['source_id']} · {benchmark['record_id']}", benchmark["source_url"]),
+        (
+            "Verified payment or repeat-use evidence can change the Horse score.",
+            "A completed falsification milestone can change both evidence confidence and the "
+            "Jockey score.",
+            "Contradictory primary evidence can reverse any positive verdict.",
+        ),
+        evidence,
         dict(answers),
         manifest["artifact_id"],
         manifest["effective_date"],

@@ -8,6 +8,8 @@
   Case Knowledge and deterministic authority.
 - [ADR-CORE-003](./adrs/core/ADR-CORE-003-GOVERNED-BROWSER-CONVERSATION.md) governs free-form and
   optional provider-free browser conversation.
+- [ADR-CORE-004](./adrs/core/ADR-CORE-004-DOMAIN-DECISION-ENGINES-V1.md) gives CareerSim,
+  HouseWise and StartupEval domain-shaped deterministic intelligence over versioned assets.
 
 ADRs are immutable once accepted; later decisions supersede rather than edit history. Each record includes status, context, decision, alternatives, consequences, migration, and validation evidence.
 

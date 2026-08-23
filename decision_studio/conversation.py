@@ -73,6 +73,9 @@ def _number_value(text: str, question: Question) -> float | int | None:
 def coerce_answer(text: str, question: Question) -> Any | None:
     if question.answer_type == "choice":
         return _choice_value(text, question)
+    if question.answer_type == "text":
+        value = text.strip()
+        return value if len(value) >= 8 else None
     return _number_value(text, question)
 
 
@@ -157,6 +160,9 @@ def validate_model_action(raw: dict[str, Any], question: Question, model_id: str
         if question.answer_type == "choice":
             if value not in question.options:
                 raise ValueError("model proposed a choice outside the governed options")
+        elif question.answer_type == "text":
+            if not isinstance(value, str) or len(value.strip()) < 8 or len(value) > 2_000:
+                raise ValueError("model proposed invalid bounded text")
         elif not isinstance(value, (int, float)) or isinstance(value, bool):
             raise ValueError("model proposed a non-numeric value")
         elif (question.minimum is not None and value < question.minimum) or (

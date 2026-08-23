@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import shutil
 import uuid
 from dataclasses import dataclass
@@ -81,7 +82,12 @@ def _validate_metric_catalog(catalog: dict[str, Any]) -> list[dict[str, Any]]:
     return issues
 
 
-def refresh_product(root: Path, product_id: str, effective_date: date) -> RefreshOutcome:
+def refresh_product(
+    root: Path,
+    product_id: str,
+    effective_date: date,
+    release_tag: str | None = None,
+) -> RefreshOutcome:
     product_root = root / product_id
     source_path = product_root / "data" / "seed.csv"
     schema_path = product_root / "schemas" / "gka.schema.json"
@@ -145,14 +151,19 @@ def refresh_product(root: Path, product_id: str, effective_date: date) -> Refres
     }
 
     releases_root = root / "knowledge" / "releases" / product_id
-    release_dir = releases_root / effective
-    candidate = releases_root / ".candidates" / f"{effective}-{uuid.uuid4().hex}"
+    if release_tag and not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,47}", release_tag):
+        raise RefreshError("release tag must be a lowercase slug of at most 48 characters")
+    release_name = f"{effective}-{release_tag}" if release_tag else effective
+    release_dir = releases_root / release_name
+    candidate = releases_root / ".candidates" / f"{release_name}-{uuid.uuid4().hex}"
     candidate.mkdir(parents=True, exist_ok=False)
     try:
         (candidate / "grand_knowledge_asset.csv").write_bytes(source_bytes)
         (candidate / "metric_catalog.json").write_bytes(catalog_bytes)
+        (candidate / "source_catalog.json").write_bytes(canonical_json(sources))
         (candidate / "manifest.json").write_bytes(canonical_json(manifest.to_dict()))
         (candidate / "quality.json").write_bytes(canonical_json(quality))
+        (candidate / "validation_report.json").write_bytes(canonical_json(quality))
         if release_dir.exists():
             existing = _read_json(release_dir / "manifest.json")
             if existing.get("content_sha256") != artifact_hash:
@@ -180,8 +191,10 @@ def refresh_product(root: Path, product_id: str, effective_date: date) -> Refres
     return RefreshOutcome(product_id, effective, release_dir, len(rows), artifact_hash, status)
 
 
-def refresh_all(root: Path, effective_date: date) -> tuple[RefreshOutcome, ...]:
+def refresh_all(
+    root: Path, effective_date: date, release_tag: str | None = None
+) -> tuple[RefreshOutcome, ...]:
     return tuple(
-        refresh_product(root, product_id, effective_date)
+        refresh_product(root, product_id, effective_date, release_tag)
         for product_id in ("careersim", "housewise", "startup")
     )

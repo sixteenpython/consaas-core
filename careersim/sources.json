@@ -1,12 +1,15 @@
 {
-  "schema_version":2,
+  "schema_version":3,
   "sources":[
-    {"source_id":"careersim_overseas_archetypes","publisher":"ConSaaS","mode":"curated_snapshot","url":"careersim/data/seed.csv","license":"project-authored illustrative synthesis","cadence":"monthly review"},
+    {"source_id":"careersim_pathway_synthesis","publisher":"ConSaaS","mode":"curated_snapshot","url":"careersim/data/seed.csv","license":"project-authored pathway synthesis; underlying references linked per row","cadence":"monthly review"},
     {"source_id":"educationusa","publisher":"U.S. Department of State","mode":"reference_only","url":"https://educationusa.state.gov/","license":"official public information; verify reuse terms","cadence":"monthly review"},
     {"source_id":"canada_ircc","publisher":"Government of Canada","mode":"reference_only","url":"https://www.canada.ca/en/services/immigration-citizenship.html","license":"official public information; verify reuse terms","cadence":"monthly review"},
     {"source_id":"uk_visas","publisher":"Government of the United Kingdom","mode":"reference_only","url":"https://www.gov.uk/student-visa","license":"official public information; verify reuse terms","cadence":"monthly review"},
     {"source_id":"eu_study","publisher":"European Commission","mode":"reference_only","url":"https://education.ec.europa.eu/study-in-europe","license":"official public information; verify reuse terms","cadence":"monthly review"},
     {"source_id":"australia_home_affairs","publisher":"Australian Government","mode":"reference_only","url":"https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500","license":"official public information; verify reuse terms","cadence":"monthly review"},
-    {"source_id":"rbi_fx","publisher":"Reserve Bank of India","mode":"reference_only","url":"https://data.rbi.org.in/","license":"official public information; verify reuse terms","cadence":"monthly"}
+    {"source_id":"rbi_fx","publisher":"Reserve Bank of India","mode":"reference_only","url":"https://data.rbi.org.in/","license":"official public information; verify reuse terms","cadence":"monthly"},
+    {"source_id":"canada_labour","publisher":"Statistics Canada","mode":"reference_only","url":"https://www150.statcan.gc.ca/n1/pub/75-006-x/2025001/article/00002-eng.htm","license":"official public information; verify reuse terms","cadence":"annual"},
+    {"source_id":"euraxess","publisher":"European Commission","mode":"reference_only","url":"https://euraxess.ec.europa.eu/jobs","license":"official public information; verify reuse terms","cadence":"monthly review"},
+    {"source_id":"ukri","publisher":"UK Research and Innovation","mode":"reference_only","url":"https://www.ukri.org/what-we-do/developing-people-and-skills/","license":"official public information; verify reuse terms","cadence":"annual"}
   ]
 }

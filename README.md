@@ -10,7 +10,9 @@ The root Streamlit application now contains three bounded, runnable Decision Int
 - **HouseWise** for Indian residential purchase decisions;
 - **StartupEval** for founder and investor venture assessment.
 
-Each journey uses a free-form adaptive expert conversation, an epistemic and revision-aware
+Decision Studio v0.4 adds scenario/Pareto intelligence for education and property plus an
+eleven-question India Problem Observatory and Horse/Jockey engine for startup assessment. Each
+journey uses a free-form adaptive expert conversation, an epistemic and revision-aware
 session-only Case Knowledge Asset, a live Decision Position, a promoted GKA with explicit
 decision-metric coverage, a versioned deterministic policy, explainable recommendations and an
 optional provider-free browser model behind a typed validation gate. Run it with
@@ -20,11 +22,15 @@ Refresh all three promoted knowledge assets with:
 
 ```powershell
 python refresh_monthly.py --effective-date YYYY-MM-DD
+# For a corrected same-day methodology release:
+python refresh_monthly.py --effective-date YYYY-MM-DD --release-tag decision-intelligence-v1
 ```
 
 See [Decision Studio architecture](./docs/DECISION_STUDIO_FOUNDATION.md) and the
 [monthly operations runbook](./docs/DECISION_STUDIO_OPERATIONS.md). The v0.3 interaction boundary is
 documented in [Conversational Decision Intelligence](./docs/CONVERSATIONAL_DECISION_INTELLIGENCE.md).
+The v0.4 domain engines are documented in
+[Domain Decision Intelligence v1](./docs/DECISION_STUDIO_REENGINEERING_V1.md).
 
 ## Product contract
 

@@ -15,7 +15,7 @@ class Question:
     minimum: float | None = None
     maximum: float | None = None
     step: float | None = None
-    default: float | None = None
+    default: Any | None = None
     importance: int = 50
     why_it_matters: str = ""
     expert_context: str = ""

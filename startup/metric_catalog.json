@@ -1,183 +1,31 @@
 {
-  "schema_version": "0.2.0",
+  "schema_version": "1.0.0",
   "product_id": "startup",
-  "decision": "Stage-adjusted startup evidence and next capital decision",
+  "decision": "India problem evidence and Horse/Jockey investment adjudication",
   "metrics": [
-    {
-      "metric_id": "entity_status",
-      "label": "Entity and DPIIT status",
-      "decision_use": "Identity and eligibility context",
-      "coverage": "planned_connector",
-      "freshness": "monthly",
-      "preferred_source": "MCA / Startup India"
-    },
-    {
-      "metric_id": "stage",
-      "label": "Venture stage",
-      "decision_use": "Select appropriate evidence standard",
-      "coverage": "available",
-      "freshness": "decision time",
-      "preferred_source": "Case Knowledge Asset"
-    },
-    {
-      "metric_id": "founder_commitment",
-      "label": "Founder capability and commitment",
-      "decision_use": "Execution-risk assessment",
-      "coverage": "required_case_evidence",
-      "freshness": "decision time",
-      "preferred_source": "Founder evidence"
-    },
-    {
-      "metric_id": "team_coverage",
-      "label": "Critical team coverage",
-      "decision_use": "Execution bottleneck assessment",
-      "coverage": "available",
-      "freshness": "decision time",
-      "preferred_source": "Case Knowledge Asset"
-    },
-    {
-      "metric_id": "revenue_quality",
-      "label": "Recurring or repeatable revenue",
-      "decision_use": "Commercial-evidence strength",
-      "coverage": "available",
-      "freshness": "monthly",
-      "preferred_source": "Management accounts"
-    },
-    {
-      "metric_id": "growth",
-      "label": "Revenue or active-customer growth",
-      "decision_use": "Momentum assessment",
-      "coverage": "available",
-      "freshness": "monthly",
-      "preferred_source": "Management accounts"
-    },
-    {
-      "metric_id": "retention",
-      "label": "Cohort retention and churn",
-      "decision_use": "Persistence of customer value",
-      "coverage": "available",
-      "freshness": "monthly",
-      "preferred_source": "Product / billing data"
-    },
-    {
-      "metric_id": "gross_margin",
-      "label": "Gross margin",
-      "decision_use": "Delivery-economic viability",
-      "coverage": "available",
-      "freshness": "monthly",
-      "preferred_source": "Management accounts"
-    },
-    {
-      "metric_id": "contribution_margin",
-      "label": "Contribution margin",
-      "decision_use": "Scalable unit economics",
-      "coverage": "required_case_evidence",
-      "freshness": "monthly",
-      "preferred_source": "Management accounts"
-    },
-    {
-      "metric_id": "cac",
-      "label": "Customer acquisition cost",
-      "decision_use": "Acquisition efficiency",
-      "coverage": "required_case_evidence",
-      "freshness": "monthly",
-      "preferred_source": "Sales and marketing data"
-    },
-    {
-      "metric_id": "ltv",
-      "label": "Customer lifetime value",
-      "decision_use": "Value-to-acquisition comparison",
-      "coverage": "required_case_evidence",
-      "freshness": "quarterly",
-      "preferred_source": "Cohort data"
-    },
-    {
-      "metric_id": "payback",
-      "label": "CAC payback period",
-      "decision_use": "Capital-efficiency assessment",
-      "coverage": "required_case_evidence",
-      "freshness": "monthly",
-      "preferred_source": "Calculated from case"
-    },
-    {
-      "metric_id": "burn",
-      "label": "Net monthly burn",
-      "decision_use": "Capital consumption",
-      "coverage": "required_case_evidence",
-      "freshness": "monthly",
-      "preferred_source": "Cash flow"
-    },
-    {
-      "metric_id": "runway",
-      "label": "Cash runway",
-      "decision_use": "Survival gate",
-      "coverage": "available",
-      "freshness": "monthly",
-      "preferred_source": "Cash flow"
-    },
-    {
-      "metric_id": "concentration",
-      "label": "Customer concentration",
-      "decision_use": "Revenue fragility",
-      "coverage": "required_case_evidence",
-      "freshness": "monthly",
-      "preferred_source": "Billing data"
-    },
-    {
-      "metric_id": "pipeline",
-      "label": "Pipeline conversion and cycle",
-      "decision_use": "Forward revenue quality",
-      "coverage": "required_case_evidence",
-      "freshness": "monthly",
-      "preferred_source": "CRM"
-    },
-    {
-      "metric_id": "market_evidence",
-      "label": "Bottom-up market evidence",
-      "decision_use": "Scale plausibility",
-      "coverage": "required_case_evidence",
-      "freshness": "quarterly",
-      "preferred_source": "Customer and market research"
-    },
-    {
-      "metric_id": "competitive_moat",
-      "label": "Differentiation and defensibility",
-      "decision_use": "Long-term value capture",
-      "coverage": "required_case_evidence",
-      "freshness": "quarterly",
-      "preferred_source": "Product and market evidence"
-    },
-    {
-      "metric_id": "regulatory_path",
-      "label": "Regulatory and compliance path",
-      "decision_use": "Permission-to-operate gate",
-      "coverage": "available",
-      "freshness": "policy change",
-      "preferred_source": "Regulator / counsel"
-    },
-    {
-      "metric_id": "cap_table",
-      "label": "Cap table and governance",
-      "decision_use": "Funding and control risk",
-      "coverage": "required_case_evidence",
-      "freshness": "financing event",
-      "preferred_source": "Company records"
-    },
-    {
-      "metric_id": "scenario_capital",
-      "label": "Capital needed to next evidence milestone",
-      "decision_use": "Funding prescription",
-      "coverage": "available",
-      "freshness": "decision time",
-      "preferred_source": "Deterministic engine"
-    },
-    {
-      "metric_id": "source_quality",
-      "label": "Evidence quality and freshness",
-      "decision_use": "Recommendation authority",
-      "coverage": "available",
-      "freshness": "each refresh",
-      "preferred_source": "ConSaaS provenance"
-    }
+    {"metric_id":"problem_reality","label":"Problem reality","decision_use":"Horse reality gate","coverage":"available","freshness":"monthly","preferred_source":"India Problem Observatory"},
+    {"metric_id":"problem_severity","label":"Problem severity","decision_use":"Pain magnitude","coverage":"available","freshness":"monthly","preferred_source":"Official and curated evidence"},
+    {"metric_id":"problem_frequency","label":"Problem frequency","decision_use":"Persistence of demand","coverage":"available","freshness":"monthly","preferred_source":"Case and Observatory"},
+    {"metric_id":"affected_segment","label":"Affected segment","decision_use":"Customer specificity","coverage":"available","freshness":"monthly","preferred_source":"India Problem Observatory"},
+    {"metric_id":"problem_geography","label":"Indian geography","decision_use":"Local applicability","coverage":"available","freshness":"monthly","preferred_source":"India Problem Observatory"},
+    {"metric_id":"payer_evidence","label":"Willing payer evidence","decision_use":"Commercial gate","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"current_alternatives","label":"Current alternatives","decision_use":"Baseline comparison","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Customer evidence"},
+    {"metric_id":"solution_coverage","label":"Solution coverage","decision_use":"Crowding context","coverage":"available","freshness":"monthly","preferred_source":"India Problem Observatory"},
+    {"metric_id":"solution_effectiveness","label":"Solution effectiveness","decision_use":"Remaining gap","coverage":"available","freshness":"monthly","preferred_source":"India Problem Observatory"},
+    {"metric_id":"whitespace","label":"White-space evidence","decision_use":"Underserved opportunity","coverage":"available","freshness":"monthly","preferred_source":"Deterministic engine"},
+    {"metric_id":"solution_outcome","label":"Solution mechanism and outcome","decision_use":"Value creation","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"traction","label":"Behavioural traction","decision_use":"Demand validation","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder primary evidence"},
+    {"metric_id":"retention","label":"Repeat use or retention","decision_use":"Persistence of value","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Product or billing data"},
+    {"metric_id":"business_economics","label":"Sustainable economics","decision_use":"Cash-flow viability","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"regulatory_feasibility","label":"Regulatory feasibility","decision_use":"Permission-to-operate context","coverage":"available","freshness":"monthly","preferred_source":"India Problem Observatory"},
+    {"metric_id":"founder_problem_fit","label":"Founder–problem fit","decision_use":"Jockey relevance","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"execution_evidence","label":"Completed execution","decision_use":"Jockey delivery ability","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"learning_discipline","label":"Learning discipline","decision_use":"Response to disconfirming evidence","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"capital_discipline","label":"Capital discipline","decision_use":"Milestone efficiency","coverage":"required_case_evidence","freshness":"decision time","preferred_source":"Founder evidence"},
+    {"metric_id":"horse_score","label":"Horse score","decision_use":"70% business-model assessment","coverage":"available","freshness":"each decision","preferred_source":"Deterministic engine"},
+    {"metric_id":"jockey_score","label":"Jockey score","decision_use":"30% founder assessment","coverage":"available","freshness":"each decision","preferred_source":"Deterministic engine"},
+    {"metric_id":"problem_match","label":"Observatory match authority","decision_use":"External-evidence confidence","coverage":"available","freshness":"each decision","preferred_source":"Deterministic engine"},
+    {"metric_id":"fatal_unknown","label":"Fatal unknown","decision_use":"Next falsification experiment","coverage":"available","freshness":"each decision","preferred_source":"Deterministic engine"},
+    {"metric_id":"source_quality","label":"Evidence provenance","decision_use":"Recommendation authority","coverage":"available","freshness":"each refresh","preferred_source":"ConSaaS provenance"}
   ]
 }

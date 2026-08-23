@@ -1,25 +1,181 @@
-"""Deterministic overseas-education ROI engine for Indian students."""
+"""CareerSim deterministic education-investment simulation and optimisation engine."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
+from core.optimization import (
+    bounded,
+    internal_rate_of_return,
+    pareto_front,
+    present_value,
+    ranking_stability,
+)
 from plugin_sdk.decision import DecisionReport, ScoredOption
 
 
-def _bounded(value: float) -> float:
-    return max(0.0, min(100.0, value))
+@dataclass(frozen=True, slots=True)
+class CareerCandidate:
+    option: ScoredOption
+    objectives: dict[str, float]
 
 
-def _funding_fit(plan: str, funding_model: str, affordability: float) -> float:
-    funded = "funded" in funding_model.lower() or "stipend" in funding_model.lower()
-    if plan == "Dependent on scholarship / assistantship":
-        return 100.0 if funded else 35.0
-    if plan == "Substantial education loan":
-        return _bounded(115 - (100 - affordability) * 1.3)
-    if plan == "Mixed family funding and modest loan":
-        return _bounded((affordability + (75 if funded else 55)) / 2)
-    return affordability
+def _number(row: dict[str, str], key: str) -> float:
+    return float(row[key])
+
+
+def _salary_band(row: dict[str, str], career_goal: str) -> tuple[float, float, float]:
+    overseas = (
+        _number(row, "salary_p10_inr"),
+        _number(row, "salary_p50_inr"),
+        _number(row, "salary_p90_inr"),
+    )
+    if career_goal == "Return to India soon after graduation":
+        midpoint = _number(row, "india_return_salary_inr")
+        return midpoint * 0.72, midpoint, midpoint * 1.45
+    if career_goal == "Work overseas then return to India":
+        india = _number(row, "india_return_salary_inr")
+        return tuple((value + india) / 2 for value in overseas)  # type: ignore[return-value]
+    if career_goal == "Research / academic career":
+        return tuple(value * 0.82 for value in overseas)  # type: ignore[return-value]
+    return overseas
+
+
+def _incremental_cashflows(
+    economic_cost: float, salary: float, counterfactual: float, tax_rate: float
+) -> tuple[float, ...]:
+    premium = salary * (1 - tax_rate) - counterfactual
+    return (-economic_cost, *(premium * 1.05**year for year in range(10)))
+
+
+def _candidate(
+    row: dict[str, str], answers: dict[str, Any], budget: float
+) -> CareerCandidate | None:
+    if row["degree_level"] != answers["degree_level"]:
+        return None
+    if answers["field"] != "Flexible / undecided" and row["field"] not in {
+        answers["field"],
+        "Flexible / undecided",
+    }:
+        return None
+    if (
+        answers["target_region"] != "Multiple regions"
+        and row["target_region"] != answers["target_region"]
+    ):
+        return None
+    cost = _number(row, "total_cost_inr")
+    funded = row["funding_model"] in {"Funded", "Usually stipend-funded", "Usually salaried"}
+    if cost > budget * 1.5 and not funded:
+        return None
+    duration = _number(row, "duration_years")
+    counterfactual = _number(row, "counterfactual_salary_inr")
+    economic_cost = cost + counterfactual * duration
+    salary_band = _salary_band(row, str(answers["career_goal"]))
+    tax_rate = _number(row, "tax_rate_pct") / 100
+    cashflows = tuple(
+        _incremental_cashflows(economic_cost, salary, counterfactual, tax_rate)
+        for salary in salary_band
+    )
+    npvs = tuple(present_value(flow, 0.08) for flow in cashflows)
+    base_irr = internal_rate_of_return(cashflows[1])
+    outcome_probability = (
+        _number(row, "completion_probability_pct")
+        / 100
+        * _number(row, "employment_probability_score")
+        / 100
+    )
+    positive_probability = (
+        0.88 if npvs[0] > 0 else 0.68 if npvs[1] > 0 else 0.38 if npvs[2] > 0 else 0.12
+    ) * outcome_probability
+    affordability = bounded(budget / max(cost, 1) * 100)
+    loan_ratio = {
+        "Family-funded with little or no debt": 0.08,
+        "Mixed family funding and modest loan": 0.35,
+        "Substantial education loan": 0.70,
+        "Dependent on scholarship / assistantship": 0.45,
+    }[str(answers["funding_plan"])]
+    if funded:
+        loan_ratio *= 0.2
+    debt = cost * loan_ratio
+    debt_resilience = bounded(100 - debt / max(salary_band[1] * (1 - tax_rate), 1) * 34)
+    downside_score = bounded(50 + npvs[0] / max(economic_cost, 1) * 35)
+    value_score = bounded(50 + npvs[1] / max(economic_cost, 1) * 32)
+    evidence = _number(row, "evidence_score")
+    work_rights = _number(row, "work_rights_score")
+    quality = _number(row, "quality_score")
+    risk_fit = bounded(
+        100
+        - (_number(row, "risk_score") + _number(row, "visa_uncertainty_score"))
+        / 2
+        * {"Low": 1.2, "Moderate": 1.0, "High": 0.8}[str(answers["risk_tolerance"])]
+    )
+    score = (
+        positive_probability * 100 * 0.23
+        + value_score * 0.18
+        + downside_score * 0.14
+        + affordability * 0.13
+        + debt_resilience * 0.10
+        + work_rights * 0.07
+        + quality * 0.05
+        + risk_fit * 0.06
+        + evidence * 0.04
+    )
+    priority_score = {
+        "Downside-adjusted financial ROI": (downside_score + value_score + debt_resilience) / 3,
+        "Career acceleration": _number(row, "employability_score"),
+        "Low debt": (affordability + debt_resilience) / 2,
+        "Academic depth": quality,
+        "International mobility": work_rights,
+        "Long-term optionality": (quality + work_rights + risk_fit) / 3,
+    }[str(answers["priority"])]
+    score = bounded(score + (priority_score - 50) * 0.08)
+    adjustment = max(0.0, cost - budget)
+    fit = "Investable within ceiling" if adjustment == 0 else "Adjust funding or option"
+    risks = [row["notes"]]
+    if adjustment:
+        risks.append(f"The current all-in estimate exceeds the ceiling by ₹{adjustment:,.0f}.")
+    if npvs[0] < 0:
+        risks.append("The downside scenario does not recover the full economic investment.")
+    if debt_resilience < 55:
+        risks.append("Debt remains fragile relative to the relevant post-study income.")
+    option = ScoredOption(
+        row["record_id"],
+        row["option_name"],
+        round(score, 1),
+        fit,
+        (
+            f"Probability-weighted positive-NPV estimate is {positive_probability * 100:.0f}%.",
+            f"Ten-year incremental NPV is ₹{npvs[1] / 100000:.1f} lakh in the base "
+            f"case and ₹{npvs[0] / 100000:.1f} lakh in the downside case.",
+            f"All-in cost is ₹{cost / 100000:.1f} lakh versus the responsible ceiling "
+            f"of ₹{budget / 100000:.1f} lakh.",
+        ),
+        tuple(risks),
+        (f"{row['source_id']} · observed {row['observed_on']}", row["source_url"]),
+        {
+            "all-in education investment ₹": round(cost),
+            "economic cost including foregone income ₹": round(economic_cost),
+            "downside incremental NPV ₹": round(npvs[0]),
+            "base incremental NPV ₹": round(npvs[1]),
+            "upside incremental NPV ₹": round(npvs[2]),
+            "base incremental IRR %": round((base_irr or -1) * 100, 1),
+            "probability of positive NPV %": round(positive_probability * 100, 1),
+            "debt resilience score": round(debt_resilience, 1),
+            "evidence authority score": evidence,
+            "required funding adjustment ₹": round(adjustment),
+        },
+    )
+    return CareerCandidate(
+        option,
+        {
+            "return": value_score,
+            "downside": downside_score,
+            "affordability": affordability,
+            "resilience": debt_resilience,
+            "authority": evidence,
+        },
+    )
 
 
 def decide(
@@ -29,157 +185,68 @@ def decide(
     manifest: dict[str, Any],
 ) -> DecisionReport:
     budget = float(answers["budget_inr"])
-    risk_multiplier = {"Low": 1.25, "Moderate": 1.0, "High": 0.78}[answers["risk_tolerance"]]
-    weights = policy["weights"]
-    options: list[ScoredOption] = []
-    for row in rows:
-        if (
-            answers["target_region"] != "Multiple regions"
-            and row["target_region"] != answers["target_region"]
-        ):
-            continue
-        cost = float(row["total_cost_inr"])
-        field_fit = (
-            100.0
-            if row["field"] == answers["field"]
-            else 78.0
-            if "Flexible" in row["field"] or answers["field"] == "Flexible / undecided"
-            else 35.0
-        )
-        degree_fit = 100.0 if row["degree_level"] == answers["degree_level"] else 0.0
-        destination_fit = 100.0 if answers["target_region"] == row["target_region"] else 82.0
-        affordability = _bounded((budget / max(cost, 1)) * 100)
-        quality = float(row["quality_score"])
-        employability = (
-            float(row["employability_score"]) + float(row["employment_probability_score"])
-        ) / 2
-        salary = (
-            float(row["india_return_salary_inr"])
-            if answers["career_goal"] == "Return to India soon after graduation"
-            else float(row["overseas_start_salary_inr"])
-        )
-        salary_value = _bounded(salary / max(cost, 1) * 115)
-        work_rights = float(row["work_rights_score"])
-        funding_fit = _funding_fit(answers["funding_plan"], row["funding_model"], affordability)
-        compound_risk = (float(row["risk_score"]) + float(row["visa_uncertainty_score"])) / 2
-        risk_fit = _bounded(100 - compound_risk * risk_multiplier)
-        dimensions = {
-            "field_fit": field_fit,
-            "degree_fit": degree_fit,
-            "destination_fit": destination_fit,
-            "affordability": affordability,
-            "quality": quality,
-            "employability": employability,
-            "salary_value": salary_value,
-            "work_rights": work_rights,
-            "funding_fit": funding_fit,
-            "risk_fit": risk_fit,
-        }
-        score = sum(dimensions[key] * float(weight) for key, weight in weights.items())
-        priority_dimension = {
-            "Downside-adjusted financial ROI": (salary_value + affordability + risk_fit) / 3,
-            "Career acceleration": employability,
-            "Low debt": (affordability + funding_fit) / 2,
-            "Academic depth": quality,
-            "International mobility": work_rights,
-            "Long-term optionality": (quality + employability + work_rights) / 3,
-        }[answers["priority"]]
-        score += (priority_dimension - 50) * 0.1
-        if answers["career_goal"] == "Research / academic career" and row["degree_level"] == "PhD":
-            score += 6
-        risks = [row["notes"]]
-        if affordability < 100 and "funded" not in row["funding_model"].lower():
-            risks.append("The indicative all-in cost exceeds the responsible family ceiling.")
-        if answers["funding_plan"] == "Substantial education loan" and cost > salary * 1.4:
-            risks.append("Debt would be large relative to the relevant starting-income reference.")
-            score -= 7
-        if answers["academic_readiness"] == "Developing" and quality >= 88:
-            risks.append(
-                "Admission is ambitious; retain credible balanced and resilient applications."
-            )
-            score -= 5
-        if answers["career_goal"] == "Return to India soon after graduation":
-            risks.append(
-                "ROI uses the lower India-return salary reference, not an overseas headline."
-            )
-        funded_path = row["degree_level"] == "PhD" and (
-            "funded" in row["funding_model"].lower() or "stipend" in row["funding_model"].lower()
-        )
-        fit = (
-            "Funding-dependent research path"
-            if funded_path
-            else "Within responsible ceiling"
-            if affordability >= 100
-            else "Funding gap"
-        )
-        options.append(
-            ScoredOption(
-                row["record_id"],
-                row["option_name"],
-                round(_bounded(score), 1),
-                fit,
-                (
-                    f"Indicative all-in investment is ₹{cost / 100000:.1f} lakh versus your "
-                    f"₹{budget / 100000:.1f} lakh responsible ceiling.",
-                    f"Relevant starting-income reference is ₹{salary / 100000:.1f} lakh; "
-                    f"employment evidence scores {employability:.0f}/100.",
-                    f"Post-study work-path score is {work_rights:.0f}/100 and the indicative "
-                    f"payback horizon is {float(row['roi_horizon_years']):.1f} years.",
-                ),
-                tuple(risks),
-                (f"{row['source_id']} · observed {row['observed_on']}", row["source_url"]),
-                {
-                    "indicative all-in investment ₹": cost,
-                    "relevant starting-income reference ₹": salary,
-                    "employment evidence score": round(employability, 1),
-                    "post-study work-path score": work_rights,
-                    "indicative payback horizon years": float(row["roi_horizon_years"]),
-                },
-            )
-        )
-    ranked = tuple(sorted(options, key=lambda item: item.score, reverse=True)[:3])
+    candidates = [candidate for row in rows if (candidate := _candidate(row, answers, budget))]
+    objectives = [candidate.objectives for candidate in candidates]
+    frontier_indices = pareto_front(
+        objectives, ("return", "downside", "affordability", "resilience", "authority")
+    )
+    ordered = sorted(
+        (candidates[index] for index in frontier_indices),
+        key=lambda item: item.option.score,
+        reverse=True,
+    )
+    for candidate in sorted(candidates, key=lambda item: item.option.score, reverse=True):
+        if candidate not in ordered:
+            ordered.append(candidate)
+    ranked = tuple(candidate.option for candidate in ordered[:3])
     top = ranked[0] if ranked else None
-    top_score = top.score if top else 0.0
-    thresholds = policy["verdict_thresholds"]
-    if not top:
-        verdict = "NEEDS MORE EVIDENCE — EXPAND THE DESTINATION OR FIELD SET"
-    elif top_score >= thresholds["strong"] and top.fit != "Funding gap":
-        verdict = "PROMISING ROI — VERIFY THE EXACT PROGRAMME AND FUNDING"
-    elif top_score >= thresholds["conditional"]:
-        verdict = "CONDITIONAL ROI — RESOLVE FUNDING, VISA OR EMPLOYMENT RISK"
+    if top is None:
+        verdict, top_score = "WAIT — NO FEASIBLE PROGRAMME PATH IS COVERED", 0.0
+    elif (
+        top.score >= float(policy["verdict_thresholds"]["strong"])
+        and top.fit == "Investable within ceiling"
+    ):
+        verdict, top_score = "GO — PROCEED TO PROGRAMME-LEVEL DILIGENCE", top.score
+    elif top.score >= float(policy["verdict_thresholds"]["conditional"]):
+        verdict, top_score = (
+            "ADJUST — CHANGE COST, FUNDING OR DESTINATION BEFORE COMMITTING",
+            top.score,
+        )
     else:
-        verdict = "DO NOT COMMIT YET — THE DOWNSIDE IS TOO FRAGILE"
+        verdict, top_score = (
+            "DO NOT INVEST YET — THE DOWNSIDE-ADJUSTED RETURN IS TOO WEAK",
+            top.score,
+        )
     return DecisionReport(
         "careersim",
         verdict,
         top_score,
-        "Low" if not ranked else "Medium",
-        "Overseas archetypes only; exact programme, funding, visa and outcome evidence required",
-        "The assessment tests whether an overseas degree is worth its full cost and downside risk "
-        "for an Indian student—not whether the institution is prestigious.",
+        ranking_stability([option.score for option in ranked]),
+        "Pathway-level reference universe; verify exact programme offer, funding and "
+        "current policy",
+        "CareerSim compares complete education cash flows against the no-overseas-study "
+        "counterfactual, then retains robust non-dominated paths.",
         ranked,
         tuple(dict.fromkeys(risk for option in ranked for risk in option.risks)),
         (
-            "Costs and salaries are illustrative INR-normalised archetype references, not "
-            "forecasts.",
-            "Visa, work-right and immigration policies may change before graduation.",
-            "The student's confirmed Case Knowledge Asset is accurate and current.",
+            "Forecasts are scenarios, not guaranteed salaries or immigration outcomes.",
+            "Programme fees, offers and employment distributions require verification.",
+            "The confirmed case accurately represents the student's constraints.",
         ),
         (
-            "Verify the exact tuition, living budget and written scholarship or assistantship.",
-            "Obtain programme-specific employment distributions—not only the highest salary.",
-            "Model debt repayment under overseas-employment and early-India-return scenarios.",
+            "Verify tuition, living costs, scholarship and loan terms.",
+            "Request programme-specific employment distributions.",
+            "Re-run with the written offer before paying a deposit.",
         ),
         (
-            "A guaranteed scholarship or assistantship can materially improve the verdict.",
-            "A lower-cost destination can improve downside-adjusted ROI.",
-            "Verified programme employment and current post-study work rules can change the "
-            "ranking.",
+            "A scholarship, lower-cost destination or smaller loan can change ADJUST to GO.",
+            "A weaker visa or employment scenario can reverse the ranking.",
         ),
-        tuple(dict.fromkeys(evidence for option in ranked for evidence in option.evidence)),
+        tuple(dict.fromkeys(evidence for option in ranked for evidence in option.evidence))
+        or (f"{manifest['artifact_id']} · no feasible covered path",),
         dict(answers),
         manifest["artifact_id"],
         manifest["effective_date"],
         manifest["content_sha256"],
-        policy["policy_version"],
+        str(policy["policy_version"]),
     )

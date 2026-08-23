@@ -31,7 +31,7 @@ from decision_studio.narrator import ConsultantNarrative, narrate
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.4.0"
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -128,7 +128,7 @@ def _landing() -> None:
                   <div class="cs-domain">{html.escape(product.domain)}</div>
                   <h3>{html.escape(product.name)}</h3>
                   <p>{html.escape(product.promise)}</p>
-                  <span class="cs-foundation">GKA v0.2 Decision Coverage</span>
+                  <span class="cs-foundation">GKA v1.0 Decision Coverage</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -164,9 +164,9 @@ def _landing() -> None:
             st.markdown(f"**{title}**")
             st.caption(body)
     st.warning(
-        "Decision-metric coverage is comprehensive by design; currently available observations "
-        "remain illustrative. Verify exact programme, property and venture evidence before a "
-        "consequential commitment."
+        "Metric coverage is comprehensive for the current v1 decision contract; observations "
+        "remain curated and bounded. Verify exact programme, property and venture evidence before "
+        "a consequential commitment."
     )
 
 
@@ -192,6 +192,16 @@ def _answer_widget(
             "Your answer",
             question.options,
             index=index,
+            key=key,
+            label_visibility="collapsed",
+        )
+    if question.answer_type == "text":
+        return st.text_area(
+            "Your answer",
+            value=str(initial_value or question.default or ""),
+            height=130,
+            max_chars=1600,
+            placeholder=question.expert_context,
             key=key,
             label_visibility="collapsed",
         )
@@ -317,6 +327,12 @@ def _render_guided_answer(
                 "Preserve answer and continue", type="primary", width="stretch"
             )
         if submitted:
+            if question.answer_type == "text" and len(str(answer).strip()) < 8:
+                st.warning(
+                    "Please add a little more detail, or use the conversation to say "
+                    "‘I don’t know’. "
+                )
+                return
             shown = (
                 _format_inr(float(answer)) if question.question_id.endswith("_inr") else str(answer)
             )
@@ -418,6 +434,10 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
             )
             if user_text:
                 state["messages"].append({"role": "user", "content": user_text})
+                if next_question.answer_type == "text":
+                    action = deterministic_action(user_text, next_question)
+                    _complete_dialogue_action(product_id, service, state, action)
+                    st.rerun()
                 request_id = f"{product_id}-{len(state['messages'])}"
                 state["pending_turn"] = {
                     "request_id": request_id,
