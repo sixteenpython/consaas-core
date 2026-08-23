@@ -19,6 +19,10 @@ def _number(row: dict[str, str], key: str) -> float:
     return float(row[key])
 
 
+def _lakhs(value: float) -> str:
+    return f"₹{value / 100000:.1f} lakh"
+
+
 def _annual_payment(principal: float, rate: float, years: int) -> float:
     if principal <= 0:
         return 0.0
@@ -206,23 +210,70 @@ def decide(
     top = ranked[0] if ranked else None
     if top is None:
         verdict, score = "WAIT — NO FEASIBLE SEARCH ZONE IS COVERED", 0.0
+        summary = (
+            f"WAIT—do not force a purchase. The {_lakhs(float(answers['budget_inr']))} all-in "
+            f"ceiling and {float(answers['size_sqft']):.0f} sq ft requirement do not produce a "
+            "responsible option in the currently covered city zones. Reduce the required size, "
+            "increase the cash buffer responsibly or keep renting while you search."
+        )
+        lead_action = (
+            "Do not pay a booking amount; first change the size, location or budget constraint "
+            "until at least one covered zone fits without financial strain."
+        )
     elif str(answers["financing"]) == "Stretched":
         verdict, score = "RENT/WAIT — DO NOT FORCE A FRAGILE PURCHASE", top.score
+        summary = (
+            f"RENT/WAIT. {top.title} may be the strongest covered location, but the proposed "
+            "financing leaves too little room for income, interest-rate or repair shocks. A good "
+            "property is still a bad purchase when it makes the household fragile."
+        )
+        lead_action = (
+            "Keep renting and rebuild the equity and emergency buffer before making any booking "
+            "payment."
+        )
     elif top.score >= float(policy["verdict_thresholds"]["strong"]) and top.fit == "Within ceiling":
         verdict, score = "BUY — SUBJECT TO PROPERTY-LEVEL LEGAL AND TECHNICAL DILIGENCE", top.score
+        summary = (
+            f"BUY can be justified in {top.title}, subject to one non-negotiable condition: the "
+            "exact property must clear title, approval, engineering and price diligence. The zone "
+            "fits the current budget and offers the best covered balance of return, resilience "
+            "and resale ability."
+        )
+        lead_action = (
+            f"Search in {top.title} first, but pay nothing until the exact property's title, "
+            "approvals, condition and negotiated all-in price are independently verified."
+        )
     elif top.score >= float(policy["verdict_thresholds"]["conditional"]):
         verdict, score = "BUY ONLY IF ADJUSTED — USE THE MAXIMUM PRICE AND RISK GATES", top.score
+        maximum = float(top.metrics["recommended maximum base price ₹"])
+        summary = (
+            f"BUY ONLY IF ADJUSTED. {top.title} is the best covered search zone, but the present "
+            f"size-price combination is not yet safe. Keep the base property price at or below "
+            f"{_lakhs(maximum)}, preserve the household buffer and reject any property that fails "
+            "legal or technical diligence."
+        )
+        lead_action = (
+            f"Use {_lakhs(maximum)} as the maximum base-price gate for {top.title}; walk away if "
+            "the negotiated property exceeds it or weakens your safety buffer."
+        )
     else:
         verdict, score = "RENT/WAIT — CURRENT RISK-ADJUSTED VALUE IS WEAK", top.score
+        summary = (
+            f"RENT/WAIT. Even {top.title}, the strongest covered zone, does not offer enough "
+            "risk-adjusted value for the current holding period and financing assumptions. "
+            "Preserve flexibility instead of paying transaction costs for a weak ownership case."
+        )
+        lead_action = (
+            "Do not pay a booking amount; keep renting and revisit the purchase after the price, "
+            "holding period or financing position improves."
+        )
     return DecisionReport(
         "housewise",
         verdict,
         score,
         ranking_stability([option.score for option in ranked]),
         "Micro-market search-zone evidence; no exact title or project has been approved",
-        "HouseWise has already classified the covered micro-market universe into growth, stable "
-        "and decline pathways. It applies your affordability and resilience constraints, then "
-        "returns the strongest robust search zones before property diligence.",
+        summary,
         ranked,
         tuple(dict.fromkeys(risk for option in ranked for risk in option.risks)),
         (
@@ -231,6 +282,7 @@ def decide(
             "Financing categories are planning approximations until lender terms are entered.",
         ),
         (
+            lead_action,
             "Verify RERA filings title approvals and encumbrances.",
             "Obtain comparable registered transactions and an engineering inspection.",
             "Re-run using negotiated price and written loan terms.",

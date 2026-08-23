@@ -35,7 +35,7 @@ from decision_studio.report_qa import answer_report_question, report_to_markdown
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.5.1"
+APP_VERSION = "0.5.2"
 ROOT = Path(__file__).resolve().parents[1]
 
 

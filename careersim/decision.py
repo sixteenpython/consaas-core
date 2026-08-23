@@ -25,6 +25,10 @@ def _number(row: dict[str, str], key: str) -> float:
     return float(row[key])
 
 
+def _lakhs(value: float) -> str:
+    return f"₹{value / 100000:.1f} lakh"
+
+
 def _salary_band(row: dict[str, str], career_goal: str) -> tuple[float, float, float]:
     overseas = (
         _number(row, "salary_p10_inr"),
@@ -170,9 +174,7 @@ def _candidate(
             "evidence authority score": evidence,
             "required funding adjustment ₹": round(adjustment),
             "precomputed pathway": str(atlas_entry["pathway"]),
-            "cost to risk-adjusted uplift": float(
-                atlas_entry["cost_to_risk_adjusted_uplift"]
-            ),
+            "cost to risk-adjusted uplift": float(atlas_entry["cost_to_risk_adjusted_uplift"]),
         },
     )
     return CareerCandidate(
@@ -226,20 +228,62 @@ def decide(
     top = ranked[0] if ranked else None
     if top is None:
         verdict, top_score = "WAIT — NO FEASIBLE PROGRAMME PATH IS COVERED", 0.0
+        summary = (
+            f"WAIT—do not stretch beyond the responsible {_lakhs(budget)} ceiling. None of the "
+            "currently covered paths fits the degree, field, destination and funding constraints "
+            "well enough. Secure material funding, widen the destination set or reduce the cost "
+            "before paying an application deposit."
+        )
+        lead_action = (
+            "Do not borrow or commit a deposit yet; first find a funded or lower-cost path that "
+            f"fits within the {_lakhs(budget)} ceiling."
+        )
     elif (
         top.score >= float(policy["verdict_thresholds"]["strong"])
         and top.fit == "Investable within ceiling"
     ):
         verdict, top_score = "GO — PROCEED TO PROGRAMME-LEVEL DILIGENCE", top.score
+        summary = (
+            f"GO to offer-level diligence for {top.title}. It is the strongest covered match for "
+            "your goal and funding limits, but this is not yet permission to enrol: verify the "
+            "actual offer, scholarship, employment outcomes and loan terms before paying."
+        )
+        lead_action = (
+            f"Shortlist {top.title} first and obtain its written all-in cost, funding and recent "
+            "graduate outcomes before committing money."
+        )
     elif top.score >= float(policy["verdict_thresholds"]["conditional"]):
         verdict, top_score = (
             "ADJUST — CHANGE COST, FUNDING OR DESTINATION BEFORE COMMITTING",
             top.score,
         )
+        adjustment = float(top.metrics["required funding adjustment ₹"])
+        if adjustment > 0:
+            gap = f"It is about {_lakhs(adjustment)} above your responsible ceiling. "
+        else:
+            gap = "Its return is plausible, but the downside or debt burden is not yet robust. "
+        summary = (
+            f"ADJUST before committing. {top.title} is the best covered direction, but not yet a "
+            f"safe investment on the present terms. {gap}Lower the net cost, improve funding or "
+            "choose a more resilient destination before paying a deposit."
+        )
+        lead_action = (
+            f"Keep {top.title} only as a conditional shortlist; negotiate funding and re-run the "
+            "decision using the written offer before paying."
+        )
     else:
         verdict, top_score = (
             "DO NOT INVEST YET — THE DOWNSIDE-ADJUSTED RETURN IS TOO WEAK",
             top.score,
+        )
+        summary = (
+            f"DO NOT INVEST YET. Even {top.title}, the strongest covered match, does not currently "
+            "compensate for the full cost, debt and downside risk. A lower-cost or funded route "
+            "must materially improve the numbers before an overseas degree is responsible."
+        )
+        lead_action = (
+            "Pause applications that require non-refundable money; first test a lower-cost, "
+            "funded or India-return-compatible route."
         )
     return DecisionReport(
         "careersim",
@@ -248,9 +292,7 @@ def decide(
         ranking_stability([option.score for option in ranked]),
         "Pathway-level reference universe; verify exact programme offer, funding and "
         "current policy",
-        "CareerSim has already classified the covered overseas-education universe into growth, "
-        "stable and decline pathways. It now applies your constraints, compares complete cash "
-        "flows against not studying overseas, and returns the strongest robust paths.",
+        summary,
         ranked,
         tuple(dict.fromkeys(risk for option in ranked for risk in option.risks)),
         (
@@ -259,6 +301,7 @@ def decide(
             "The confirmed case accurately represents the student's constraints.",
         ),
         (
+            lead_action,
             "Verify tuition, living costs, scholarship and loan terms.",
             "Request programme-specific employment distributions.",
             "Re-run with the written offer before paying a deposit.",

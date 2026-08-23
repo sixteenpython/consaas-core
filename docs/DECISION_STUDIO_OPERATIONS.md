@@ -29,6 +29,13 @@ Run `python -m pytest -q` after refresh. Inspect each product's `quality.json` a
 Serving resolves `knowledge/releases/<product>/current.json`; rollback is an atomic pointer change to
 a retained valid release. Never edit an old release in place.
 
+Before a public release, also run `python -m evals.run_decision_studio_stress_eval`. It exhausts
+19,440 representative CareerSim cases, 6,804 HouseWise cases and critical StartupEval evidence
+patterns. It rejects internally inconsistent reports, unsafe property verdicts under stretched
+financing, customer copy led by engine jargon, and `STRONG` startup verdicts with critical evidence
+failures. Promoted-universe integrity tests also prove that every governed GKA row appears exactly
+once in the Decision Atlas and its ordered scenarios.
+
 ## Public app
 
 `streamlit run streamlit_app.py`
