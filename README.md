@@ -81,6 +81,7 @@ Start with the [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Vision](./docs/V
 - Narrative Architect: [Architecture](./docs/NARRATIVE_ARCHITECTURE.md), [Narrative Knowledge Asset](./docs/NARRATIVE_KNOWLEDGE_ASSET.md), [Virtual Screenplay Expert](./docs/VIRTUAL_SCREENPLAY_EXPERT.md), [MVP Scope](./docs/MVP_SCOPE.md), [Implementation Roadmap](./docs/IMPLEMENTATION_ROADMAP.md)
 - Factory: [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Factory Mode](./docs/FACTORY_MODE.md), [Quality Gates](./docs/QUALITY_GATES.md), [Architecture Guardrails](./docs/ARCHITECTURE_GUARDRAILS.md), [Initial Backlog](./docs/INITIAL_FACTORY_BACKLOG.md)
 - Assurance: [AI Evaluation](./docs/AI_EVALUATION.md), [Security](./docs/SECURITY.md), [Privacy](./docs/PRIVACY.md), [Observability](./docs/OBSERVABILITY.md), [Reproducibility](./docs/REPRODUCIBILITY.md)
+- Integrated reference: [Vriddhi–ConSaaS Architecture Solution](./docs/vriddhi-consaas-arthitecture-solution.md)
 
 ## Local verification
 
