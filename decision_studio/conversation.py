@@ -182,6 +182,40 @@ def deterministic_actions(
     return tuple(actions)
 
 
+def guard_repeated_narrative(
+    case: CaseKnowledgeAsset, action: DialogueAction, question: Question
+) -> DialogueAction:
+    """Stop an exact prior narrative from being filed under a different diagnostic dimension."""
+    if action.intent != "answer" or question.answer_type != "text":
+        return action
+    proposed = _normalise(str(action.value))
+    repeated = next(
+        (
+            fact
+            for fact in case.facts
+            if fact.question_id != action.question_id
+            and isinstance(fact.value, str)
+            and _normalise(fact.value) == proposed
+        ),
+        None,
+    )
+    if repeated is None:
+        return action
+    return DialogueAction(
+        "discuss",
+        action.question_id,
+        acknowledgement=(
+            "That repeats an answer already captured for a different part of the assessment, "
+            "so I have not filed it twice."
+        ),
+        guidance=(
+            f"Please answer this specific issue: {question.prompt} "
+            f"A useful answer would focus on: {question.expert_context}"
+        ),
+        model_id=action.model_id,
+    )
+
+
 def validate_model_action(raw: dict[str, Any], question: Question, model_id: str) -> DialogueAction:
     """Validate a browser/model-proposed action before it can affect the case."""
     required = {"intent", "question_id", "value", "acknowledgement", "guidance"}

@@ -27,6 +27,7 @@ from decision_studio.conversation import (
     browser_prompt,
     deterministic_action,
     deterministic_actions,
+    guard_repeated_narrative,
     validate_model_action,
 )
 from decision_studio.narrator import ConsultantNarrative, narrate
@@ -34,7 +35,7 @@ from decision_studio.report_qa import answer_report_question, report_to_markdown
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.5.0"
+APP_VERSION = "0.5.1"
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -410,6 +411,7 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
                     action = validate_model_action(raw, pending["question"], returned["model_id"])
                 except (KeyError, TypeError, ValueError, json.JSONDecodeError):
                     action = deterministic_action(pending["text"], pending["question"])
+                action = guard_repeated_narrative(case, action, pending["question"])
                 _complete_dialogue_action(product_id, service, state, action)
                 st.rerun()
             if pending and st.button(
@@ -418,6 +420,7 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
                 width="stretch",
             ):
                 action = deterministic_action(pending["text"], pending["question"])
+                action = guard_repeated_narrative(case, action, pending["question"])
                 _complete_dialogue_action(product_id, service, state, action)
                 st.rerun()
         elif pending:
@@ -442,6 +445,10 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
                 state["messages"].append({"role": "user", "content": user_text})
                 if next_question.answer_type == "text":
                     actions = deterministic_actions(user_text, next_question, questions)
+                    actions = (
+                        guard_repeated_narrative(case, actions[0], next_question),
+                        *actions[1:],
+                    )
                     _complete_dialogue_actions(product_id, service, state, actions)
                     st.rerun()
                 request_id = f"{product_id}-{len(state['messages'])}"

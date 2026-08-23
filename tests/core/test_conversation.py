@@ -7,6 +7,7 @@ from decision_studio.conversation import (
     apply_action,
     deterministic_action,
     deterministic_actions,
+    guard_repeated_narrative,
     validate_model_action,
 )
 from plugin_sdk.decision import Question
@@ -45,6 +46,17 @@ def test_one_natural_turn_can_establish_multiple_explicit_choice_facts() -> None
         ("degree", "Master's"),
         ("region", "United States"),
     ]
+
+
+def test_exact_prior_narrative_cannot_be_filed_under_another_dimension() -> None:
+    wording = "We launched a pilot with 20 customers and measured repeat usage."
+    case = CaseKnowledgeAsset("startup").confirm("traction_evidence", wording)
+    question = Question("execution_learning", "What did you learn?", "text")
+
+    guarded = guard_repeated_narrative(case, deterministic_action(wording, question), question)
+
+    assert guarded.intent == "discuss"
+    assert apply_action(case, guarded).values == {"traction_evidence": wording}
 
 
 def test_natural_language_answer_is_preserved_for_text_question() -> None:

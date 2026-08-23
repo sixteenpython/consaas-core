@@ -228,6 +228,24 @@ def decide(
     evidence_gate = min(
         horse["problem reality"], horse["willing payer"], horse["solution mechanism"]
     )
+    combined = {f"Horse · {key}": value for key, value in horse.items()} | {
+        f"Jockey · {key}": value for key, value in jockey.items()
+    }
+    weakest = min(combined, key=combined.get)
+    fatal_unknown = weakest.replace("Horse · ", "").replace("Jockey · ", "")
+    plain_unknown = {
+        "problem reality": "direct proof that the customer problem occurs often enough",
+        "pain and frequency": "proof that leaving the problem unsolved is costly and urgent",
+        "willing payer": "real payment or a tightly measured paid-conversion test",
+        "remaining white space": "proof that current alternatives leave an important gap",
+        "solution mechanism": "a measurable before-versus-after customer outcome",
+        "behavioural traction": "repeat use, retention or payment from the target customer",
+        "sustainable economics": "credible acquisition, delivery and repeat-use economics",
+        "founder-problem fit": "specific evidence that this team has unusual access or ability",
+        "execution evidence": "a completed example of building, selling or operating",
+        "learning discipline": "an example of changing course when evidence contradicted the team",
+        "capital discipline": "a time-boxed milestone with budget and pass/fail gates",
+    }[fatal_unknown]
     thresholds = policy["verdict_thresholds"]
     if (
         overall >= thresholds["strong"]
@@ -237,55 +255,106 @@ def decide(
     ):
         verdict = "STRONG"
         summary = (
-            "The proposition is close enough to a real, payable Indian problem and the team "
-            "has supplied enough execution evidence to justify controlled investment and "
-            "deeper diligence."
+            "GO—but fund the next proof milestone, not uncontrolled scale. The problem appears "
+            "real and payable, the business model is promising, and the team has enough execution "
+            "evidence to justify a controlled next investment."
         )
     elif overall >= thresholds["conditional"] and horse["problem reality"] >= 42:
         verdict = "NOT QUITE THERE"
         summary = (
-            "There is a credible proposition, but one or more decisive assumptions still need "
-            "behavioural evidence before material capital is committed."
+            f"HOLD—do not commit scale capital yet. The opportunity is credible, but the case "
+            f"still needs {plain_unknown}. Prove that one point with a bounded experiment, then "
+            "reassess."
         )
     else:
         verdict = "FORGET IT — IN ITS CURRENT FORM"
         summary = (
-            "The present case does not yet establish a sufficiently real, payable problem and "
-            "executable business. This rejects the current evidence—not the founder or every "
-            "future version of the idea."
+            f"STOP—do not fund the proposition in its current form. The evidence does not yet "
+            f"establish {plain_unknown}. This rejects the present case, not every future version "
+            "of the idea."
         )
-    combined = {f"Horse · {key}": value for key, value in horse.items()} | {
-        f"Jockey · {key}": value for key, value in jockey.items()
-    }
-    weakest = min(combined, key=combined.get)
-    fatal_unknown = weakest.replace("Horse · ", "").replace("Jockey · ", "")
+    match_note = (
+        f"The proposition strongly matches a preprocessed Indian problem pathway "
+        f"({match_score:.0f}/100), but the underlying case evidence still requires verification."
+        if match_score >= 70
+        else f"The India Problem Observatory match is only {match_score:.0f}/100, so external "
+        "problem evidence is not yet authoritative."
+    )
     risks = (
-        f"Fatal unknown: {fatal_unknown} is the weakest supported dimension at "
-        f"{combined[weakest]:.0f}/100.",
-        f"Problem-observatory match is {match_score:.0f}/100; low semantic overlap limits "
-        "external-evidence authority.",
-        "All venture answers are self-reported and require primary-evidence diligence before "
-        "funding.",
+        f"The weakest point is {plain_unknown} ({combined[weakest]:.0f}/100).",
+        match_note,
+        "Founder responses are self-reported; consequential funding still requires primary "
+        "evidence diligence.",
     )
-    action_specs = (
-        (
-            "Proceed to controlled diligence"
-            if verdict == "STRONG"
-            else "Run the fatal-unknown experiment",
-            overall,
-            "Best current action",
-        ),
-        (
-            "Narrow the proposition around the strongest proven customer",
-            bounded(overall + 6 if horse["problem reality"] >= 60 else overall - 4),
-            "Lower-capital alternative",
-        ),
-        (
-            "Pause scale and buy evidence before building more",
-            bounded(100 - combined[weakest] / 2),
-            "Information-first alternative",
-        ),
-    )
+    if verdict == "STRONG":
+        action_specs = (
+            (
+                "GO — fund the next controlled proof milestone",
+                overall,
+                "Best current move",
+                "The Horse is investable and the Jockey clears the execution gate; release "
+                "capital in stages against evidence.",
+            ),
+            (
+                "Win one narrow customer segment before broadening",
+                bounded(overall - 2),
+                "Lower-risk growth move",
+                "Concentrating on the strongest proven customer makes payment, retention and "
+                "delivery economics easier to verify.",
+            ),
+            (
+                f"Strengthen {plain_unknown}",
+                bounded(overall - 5),
+                "Evidence-strengthening move",
+                "This is the weakest part of an otherwise fundable case and therefore the best "
+                "place to buy additional certainty.",
+            ),
+        )
+    elif verdict == "NOT QUITE THERE":
+        action_specs = (
+            (
+                "HOLD — do not scale yet",
+                overall,
+                "Best current move",
+                f"The business is promising, but material capital should wait until there is "
+                f"{plain_unknown}.",
+            ),
+            (
+                f"Run one bounded test of {plain_unknown}",
+                bounded(overall - 2),
+                "Fastest route to a decision",
+                "Use the stated time box, budget and pass/fail threshold so the next verdict is "
+                "based on behaviour rather than confidence.",
+            ),
+            (
+                "Narrow to the strongest proven customer",
+                bounded(overall - 5),
+                "Lower-capital alternative",
+                "A narrower proposition reduces acquisition and delivery uncertainty while the "
+                "fatal unknown is tested.",
+            ),
+        )
+    else:
+        action_specs = (
+            (
+                "STOP — do not fund the current proposition",
+                overall,
+                "Best current move",
+                "The present Horse/Jockey evidence does not justify an irreversible commitment.",
+            ),
+            (
+                f"Test whether you can establish {plain_unknown}",
+                bounded(overall - 2),
+                "Only sensible next experiment",
+                "Do this before building more product or raising scale capital.",
+            ),
+            (
+                "Redefine the customer and problem before reassessing",
+                bounded(overall - 5),
+                "Reset option",
+                "A smaller and more observable problem may produce a testable proposition.",
+            ),
+        )
     metrics = {
         "Horse (business model)": horse_score,
         "Jockey (founder execution)": jockey_score,
@@ -307,14 +376,15 @@ def decide(
             round(score, 1),
             fit,
             (
-                f"Horse score is {horse_score:.1f}/100 and owns 70% of the verdict.",
-                f"Jockey score is {jockey_score:.1f}/100 and owns 30% of the verdict.",
+                reason,
+                f"The business model scores {horse_score:.1f}/100 and owns 70% of the verdict; "
+                f"founder execution scores {jockey_score:.1f}/100 and owns 30%.",
             ),
             risks,
             evidence,
             metrics,
         )
-        for index, (title, score, fit) in enumerate(action_specs, start=1)
+        for index, (title, score, fit, reason) in enumerate(action_specs, start=1)
     )
     confidence = "Medium" if match_score >= 35 and min(q.values()) >= 35 else "Low"
     return DecisionReport(
@@ -334,10 +404,17 @@ def decide(
             "The assessment is decision support, not a prediction of startup success or valuation.",
         ),
         (
-            f"Verify the matched problem evidence: {problem['remaining_gap']}",
-            f"Design a time-boxed test for {fatal_unknown} with a pre-committed success threshold.",
-            "Re-run the same eleven-question assessment after the test and compare the "
-            "versioned scores.",
+            (
+                "Release only enough capital to complete the stated proof milestone; make the "
+                "next funding decision conditional on its measured result."
+                if verdict == "STRONG"
+                else "Freeze scale spending until the weakest evidence has been tested."
+                if verdict == "NOT QUITE THERE"
+                else "Do not invest further in the proposition in its current form."
+            ),
+            f"Execute the stated proof milestone: {texts['risk_milestone']}",
+            f"Collect primary evidence for the remaining market gap: {problem['remaining_gap']}",
+            "Re-run StartupEval after the milestone and compare the versioned verdict.",
         ),
         (
             "Verified payment or repeat-use evidence can change the Horse score.",

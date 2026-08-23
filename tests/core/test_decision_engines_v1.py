@@ -61,10 +61,13 @@ def test_startupeval_consaas_reference_is_strong_but_vague_case_is_not() -> None
         },
     )
     assert strong.verdict == "STRONG"
+    assert strong.summary.startswith("GO—but fund the next proof milestone")
+    assert strong.options[0].title.startswith("GO —")
+    assert "low semantic overlap" not in " ".join(strong.risks)
     assert (
         strong.options[0].metrics["Horse (business model)"]
         > strong.options[0].metrics["Jockey (founder execution)"]
     )
     assert vague.verdict != "STRONG"
     assert vague.score < strong.score
-    assert "Fatal unknown" in vague.risks[0]
+    assert "weakest point" in vague.risks[0]

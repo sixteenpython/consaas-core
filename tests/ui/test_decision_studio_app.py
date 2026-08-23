@@ -17,9 +17,9 @@ def _answer_current_question(app: AppTest, product_id: str) -> None:
     assert question is not None
     if question.answer_type == "text":
         answer = (
-            "We observed 20 customers, tested a paid pilot, measured repeat usage and changed "
-            "the product after evidence. The next 8-week milestone has a ₹2 lakh budget and "
-            "a defined pass or fail threshold."
+            f"For {question.question_id}, we observed 20 customers and tested a paid pilot. "
+            "We measured the result, changed the product after evidence, and defined an 8-week "
+            "milestone with a pass or fail threshold."
         )
     elif question.answer_type == "choice":
         answer = question.options[0]
