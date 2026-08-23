@@ -47,7 +47,8 @@ def test_project_bundle_round_trips_all_revisions() -> None:
     assert imported.project_id == repository.project_id
     assert imported.head_revision_id == repository.head_revision_id
     assert imported.history == repository.history
-    assert imported.head.state.scenes[2].outcome.endswith("safety.")
+    assert imported.head.state.locked_phases == (1, 2, 3, 4, 5)
+    assert imported.head.state.scenes[2].outcome
 
 
 def test_project_bundle_rejects_tampered_revision() -> None:
@@ -79,9 +80,9 @@ def test_demo_compiler_is_deterministic_and_source_bound() -> None:
 
     assert report.can_compile
     assert first == second
-    assert "INT. LIGHTHOUSE RADIO ROOM - NIGHT" in first
+    assert "INT. OPENING STATE SPACE - DAY" in first
     assert repository.head_revision_id in first
-    assert "author-confirmed NKA content" in first
+    assert "accepted Narrative Knowledge Asset" in first
 
 
 def test_empty_project_cannot_compile() -> None:
@@ -89,6 +90,6 @@ def test_empty_project_cannot_compile() -> None:
     report = assess_readiness(repository.head.state)
 
     assert not report.can_compile
-    assert "Establish the premise." in report.blockers
+    assert "Lock the one-line centre knot." in report.blockers
     with pytest.raises(ValueError, match="Compilation blocked"):
         compile_bounded_fountain(repository.head)

@@ -1,20 +1,19 @@
 {
-  "release_id": "narrative-foundation-alpha-0.1.0",
+  "release_id": "narrative-screenplay-builder-0.2.0",
   "product": "narrative-architect",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "source_branch": "main",
   "entrypoint": "narrative/streamlit_app.py",
   "runtime_profile": "hosted_demo",
-  "nka_schema": "narrative-nka/alpha-1",
-  "compiler": "foundation-fountain/1",
-  "models": [],
+  "nka_schema": "narrative-nka/alpha-2",
+  "compiler": "screenplay-fountain/2",
+  "models": ["optional local qwen2.5:7b-instruct via Ollama"],
   "external_llm_services": [],
   "durable_storage": false,
   "known_limits": [
-    "No local LLM integration",
     "No screenplay PDF import",
-    "No SDI or iMaSc diagnosis",
-    "No Doctor mode",
+    "Hosted profile uses deterministic skill blueprints rather than generative inference",
+    "Construction score is diagnostic and not a commercial-success prediction",
     "No server-side durable project storage"
   ]
 }

@@ -1,5 +1,18 @@
 # Narrative Architect Changelog
 
+## 0.2.0 — Screenplay Construction Studio
+
+- Rebuilt the product around six author-approved construction phases.
+- Added centre-knot suggestions, Booker basic-plot selection, and separate genre/tone controls.
+- Added proposed character ensembles with playable objectives, contradictions, behavior, voice, and arcs.
+- Added full-plot drafting through a governed skill with a deterministic hosted fallback.
+- Added five screenplay structures, recommendations, and explicit story-event beat mapping.
+- Added rich scene cards covering mini-conflict, change, behavior, blocking, and context/text/subtext.
+- Added deterministic iMaSc construction-readiness scoring, structural coverage, and a build-complete gate.
+- Added Fountain and evidence-facing Markdown scorecard compilation bound to one NKA revision.
+- Added a loopback-only optional Ollama adapter; no screenplay content is sent to external inference.
+- Migrated the canonical NKA to `alpha-2` while retaining import support for `alpha-1` project bundles.
+
 ## 0.1.0 — Foundation Alpha
 
 - Added a guided Create workspace whose questions follow gaps in canonical narrative state.
