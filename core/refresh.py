@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from core.artifacts import ArtifactManifest, atomic_write, canonical_json, content_hash
+from core.decision_atlas import ATLAS_SCHEMA_VERSION, build_decision_atlas
 
 
 class RefreshError(ValueError):
@@ -93,7 +94,9 @@ def refresh_product(
     schema_path = product_root / "schemas" / "gka.schema.json"
     sources_path = product_root / "sources.json"
     catalog_path = product_root / "metric_catalog.json"
-    if not all(path.exists() for path in (source_path, schema_path, sources_path, catalog_path)):
+    policy_path = product_root / "decision_policy.json"
+    required_inputs = (source_path, schema_path, sources_path, catalog_path, policy_path)
+    if not all(path.exists() for path in required_inputs):
         raise RefreshError(f"{product_id} refresh inputs are incomplete")
 
     source_bytes = source_path.read_bytes()
@@ -102,6 +105,7 @@ def refresh_product(
     schema = _read_json(schema_path)
     sources = _read_json(sources_path)
     catalog = _read_json(catalog_path)
+    policy = _read_json(policy_path)
     issues = _validate_rows(rows, schema) + _validate_metric_catalog(catalog)
     errors = [issue for issue in issues if issue["severity"] == "error"]
     if errors:
@@ -109,8 +113,21 @@ def refresh_product(
 
     effective = effective_date.isoformat()
     catalog_bytes = canonical_json(catalog)
-    artifact_hash = content_hash(source_bytes + catalog_bytes)
+    policy_bytes = canonical_json(policy)
+    schema_bytes = canonical_json(schema)
+    sources_bytes = canonical_json(sources)
+    artifact_hash = content_hash(
+        source_bytes
+        + catalog_bytes
+        + policy_bytes
+        + schema_bytes
+        + sources_bytes
+        + ATLAS_SCHEMA_VERSION.encode()
+    )
     artifact_id = f"{product_id}-gka-{effective}-{artifact_hash[:12]}"
+    atlas_files = build_decision_atlas(
+        product_id, rows, effective_date=effective, source_hash=artifact_hash
+    )
     created = datetime.now(UTC).isoformat()
     manifest = ArtifactManifest(
         artifact_id=artifact_id,
@@ -160,10 +177,14 @@ def refresh_product(
     try:
         (candidate / "grand_knowledge_asset.csv").write_bytes(source_bytes)
         (candidate / "metric_catalog.json").write_bytes(catalog_bytes)
-        (candidate / "source_catalog.json").write_bytes(canonical_json(sources))
+        (candidate / "decision_policy.json").write_bytes(policy_bytes)
+        (candidate / "source_catalog.json").write_bytes(sources_bytes)
+        (candidate / "gka_schema.json").write_bytes(schema_bytes)
         (candidate / "manifest.json").write_bytes(canonical_json(manifest.to_dict()))
         (candidate / "quality.json").write_bytes(canonical_json(quality))
         (candidate / "validation_report.json").write_bytes(canonical_json(quality))
+        for filename, payload in atlas_files.items():
+            (candidate / filename).write_bytes(payload)
         if release_dir.exists():
             existing = _read_json(release_dir / "manifest.json")
             if existing.get("content_sha256") != artifact_hash:

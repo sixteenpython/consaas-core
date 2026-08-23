@@ -34,6 +34,23 @@ def _normalise(text: str) -> str:
 
 def _choice_value(text: str, question: Question) -> str | None:
     normal = _normalise(text)
+    aliases = {
+        "masters": "Master's",
+        "master degree": "Master's",
+        "undergrad": "Undergraduate",
+        "bachelors": "Undergraduate",
+        "doctorate": "PhD",
+        "usa": "United States",
+        " u.s. ": "United States",
+        " uk ": "United Kingdom",
+        "bangalore": "Bengaluru",
+        "self funded": "Family-funded with little or no debt",
+        "education loan": "Substantial education loan",
+    }
+    padded = f" {normal} "
+    for phrase, option in aliases.items():
+        if phrase in padded and option in question.options:
+            return option
     exact = {_normalise(option): option for option in question.options}
     if normal in exact:
         return exact[normal]
@@ -133,6 +150,36 @@ def deterministic_action(text: str, question: Question) -> DialogueAction:
             "confirmed fact. Let’s resolve the current issue without guessing."
         ),
     )
+
+
+def deterministic_actions(
+    text: str, current: Question, questions: tuple[Question, ...]
+) -> tuple[DialogueAction, ...]:
+    """Extract multiple unambiguous facts from one natural-language turn.
+
+    The current question remains authoritative. Additional choice facts are accepted only when a
+    governed option is explicitly identifiable; the function never copies one narrative answer
+    across several text dimensions or guesses which of several numbers belongs to which field.
+    """
+    primary = deterministic_action(text, current)
+    if primary.intent != "answer":
+        return (primary,)
+    actions = [primary]
+    for question in questions:
+        if question.question_id == current.question_id or question.answer_type != "choice":
+            continue
+        value = _choice_value(text, question)
+        if value is not None:
+            actions.append(
+                DialogueAction(
+                    "answer",
+                    question.question_id,
+                    value,
+                    acknowledgement=f"I also understood **{value}**.",
+                    guidance=question.expert_context or question.why_it_matters,
+                )
+            )
+    return tuple(actions)
 
 
 def validate_model_action(raw: dict[str, Any], question: Question, model_id: str) -> DialogueAction:

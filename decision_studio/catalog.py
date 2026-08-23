@@ -89,6 +89,15 @@ def load_current_gka(root: Path, product_id: str) -> tuple[list[dict[str, str]],
     return rows, manifest
 
 
+def load_decision_atlas(root: Path, product_id: str) -> dict[str, Any]:
+    """Load the precomputed whole-universe research release."""
+    pointer = _json(root / "knowledge" / "releases" / product_id / "current.json")
+    path = root / pointer["release_path"] / "decision_atlas.json"
+    if not path.exists():
+        raise ValueError(f"{product_id} release predates the Decision Atlas contract")
+    return _json(path)
+
+
 def load_skill(root: Path, product_id: str) -> str:
     return (root / product_id / "SKILL.md").read_text(encoding="utf-8")
 

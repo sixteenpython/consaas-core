@@ -17,6 +17,7 @@ from decision_studio.case import CaseKnowledgeAsset
 from decision_studio.catalog import (
     PRODUCTS,
     load_current_gka,
+    load_decision_atlas,
     load_metric_catalog,
     load_skill,
 )
@@ -25,13 +26,15 @@ from decision_studio.conversation import (
     apply_action,
     browser_prompt,
     deterministic_action,
+    deterministic_actions,
     validate_model_action,
 )
 from decision_studio.narrator import ConsultantNarrative, narrate
+from decision_studio.report_qa import answer_report_question, report_to_markdown
 from decision_studio.service import DecisionStudio
 from plugin_sdk.decision import DecisionReport, Question
 
-APP_VERSION = "0.4.0"
+APP_VERSION = "0.5.0"
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -178,8 +181,11 @@ def _consultation(product_id: str) -> dict[str, Any]:
             "messages": [],
             "report": None,
             "pending_turn": None,
+            "report_messages": [],
         }
-    return cast(dict[str, Any], consultations[product_id])
+    state = cast(dict[str, Any], consultations[product_id])
+    state.setdefault("report_messages", [])
+    return state
 
 
 def _answer_widget(
@@ -280,6 +286,32 @@ def _complete_dialogue_action(
     state["pending_turn"] = None
 
 
+def _complete_dialogue_actions(
+    product_id: str,
+    service: DecisionStudio,
+    state: dict[str, Any],
+    actions: tuple[DialogueAction, ...],
+) -> None:
+    for action in actions:
+        state["case"] = apply_action(state["case"], action)
+    captured = [action for action in actions if action.intent == "answer"]
+    primary = actions[0]
+    extra = (
+        f" I also preserved {len(captured) - 1} other explicit decision fact(s) from that answer."
+        if len(captured) > 1
+        else ""
+    )
+    state["messages"].append(
+        {
+            "role": "assistant",
+            "content": f"{primary.acknowledgement}{extra}\n\n{primary.guidance}",
+            "model_id": primary.model_id,
+        }
+    )
+    state["report"] = service.decide_if_ready(product_id, state["case"].values)
+    state["pending_turn"] = None
+
+
 def _render_decision_position(
     case: CaseKnowledgeAsset,
     questions: tuple[Question, ...],
@@ -314,47 +346,17 @@ def _render_decision_position(
     )
 
 
-def _render_guided_answer(
-    product_id: str,
-    service: DecisionStudio,
-    state: dict[str, Any],
-    question: Question,
-) -> None:
-    with st.expander("Prefer a guided answer?"):
-        with st.form(f"question-{product_id}-{question.question_id}"):
-            answer = _answer_widget(question)
-            submitted = st.form_submit_button(
-                "Preserve answer and continue", type="primary", width="stretch"
-            )
-        if submitted:
-            if question.answer_type == "text" and len(str(answer).strip()) < 8:
-                st.warning(
-                    "Please add a little more detail, or use the conversation to say "
-                    "‘I don’t know’. "
-                )
-                return
-            shown = (
-                _format_inr(float(answer)) if question.question_id.endswith("_inr") else str(answer)
-            )
-            state["messages"].append({"role": "user", "content": shown})
-            action = DialogueAction(
-                "answer",
-                question.question_id,
-                answer,
-                "I’ve captured that as a confirmed part of your case.",
-                question.expert_context or question.why_it_matters,
-            )
-            _complete_dialogue_action(product_id, service, state, action)
-            st.rerun()
-
-
 def _render_consultant(product_id: str, service: DecisionStudio) -> None:
     state = _consultation(product_id)
     case: CaseKnowledgeAsset = state["case"]
     answers = case.values
     questions = service.questions(product_id)
     answered = len(answers)
-    next_question = service.next_question(product_id, answers, case.unresolved_ids)
+    next_question = (
+        None
+        if state["report"] is not None
+        else service.next_question(product_id, answers, case.unresolved_ids)
+    )
     use_browser = st.toggle(
         "Private browser conversation",
         value=st.session_state.browser_expert_enabled.get(product_id, False),
@@ -419,15 +421,19 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
                 _complete_dialogue_action(product_id, service, state, action)
                 st.rerun()
         elif pending:
-            action = deterministic_action(pending["text"], pending["question"])
-            _complete_dialogue_action(product_id, service, state, action)
+            actions = deterministic_actions(pending["text"], pending["question"], questions)
+            _complete_dialogue_actions(product_id, service, state, actions)
             st.rerun()
 
         if next_question:
             with st.chat_message("assistant"):
                 st.markdown(f"**{next_question.prompt}**")
-                st.caption(f"Why this matters: {next_question.why_it_matters}")
-            _render_guided_answer(product_id, service, state, next_question)
+                st.caption(f"How to think about it: {next_question.expert_context}")
+                if next_question.options:
+                    st.caption(
+                        "You can answer conversationally. Useful reference points: "
+                        + " · ".join(next_question.options)
+                    )
             user_text = st.chat_input(
                 "Answer naturally, ask why, or say ‘I don’t know’…",
                 key=f"consultant-chat-{product_id}",
@@ -435,8 +441,8 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
             if user_text:
                 state["messages"].append({"role": "user", "content": user_text})
                 if next_question.answer_type == "text":
-                    action = deterministic_action(user_text, next_question)
-                    _complete_dialogue_action(product_id, service, state, action)
+                    actions = deterministic_actions(user_text, next_question, questions)
+                    _complete_dialogue_actions(product_id, service, state, actions)
                     st.rerun()
                 request_id = f"{product_id}-{len(state['messages'])}"
                 state["pending_turn"] = {
@@ -446,10 +452,13 @@ def _render_consultant(product_id: str, service: DecisionStudio) -> None:
                     "payload": browser_prompt(user_text, next_question, case),
                 }
                 st.rerun()
-        elif answered == len(questions):
-            st.success("Your decision position is complete. The governed assessment is ready.")
+        elif state["report"] is not None:
+            st.success(
+                "I have your verdict ready. The leading move is stable under the remaining "
+                "bounded uncertainty."
+            )
             if st.button("Rebuild assessment", width="stretch"):
-                state["report"] = service.decide(product_id, answers)
+                state["report"] = service.decide_if_ready(product_id, answers)
                 st.rerun()
         else:
             st.warning(
@@ -528,6 +537,7 @@ def _render_brief(product_id: str, service: DecisionStudio) -> None:
             "messages": [],
             "report": None,
             "pending_turn": None,
+            "report_messages": [],
         }
         st.session_state.narratives.pop(product_id, None)
         st.rerun()
@@ -535,15 +545,17 @@ def _render_brief(product_id: str, service: DecisionStudio) -> None:
 
 def _render_option(option: Any, rank: int) -> None:
     with st.container(border=True):
-        top, metric = st.columns([4, 1])
-        top.markdown(f"### {rank}. {option.title}")
-        top.caption(option.fit)
-        metric.metric("Fit score", f"{option.score:.1f}")
+        st.markdown(f"### {rank}. {option.title}")
+        st.caption(option.fit)
         for reason in option.reasons:
             st.markdown(f"- {reason}")
         if option.metrics:
             with st.expander("Numbers behind this option"):
-                st.dataframe(_display_rows(option.metrics), width="stretch", hide_index=True)
+                st.dataframe(
+                    _display_rows({"decision fit score": option.score} | option.metrics),
+                    width="stretch",
+                    hide_index=True,
+                )
         with st.expander("Risks and evidence"):
             st.markdown("**Risks**")
             for risk in option.risks:
@@ -614,13 +626,9 @@ def _render_result(product_id: str) -> None:
         f"<p>{report.summary}</p></div>",
         unsafe_allow_html=True,
     )
-    metrics = st.columns(4)
-    metrics[0].metric("Decision score", f"{report.score:.1f}/100")
-    metrics[1].metric("Confidence", report.confidence)
-    metrics[2].metric("GKA effective", report.gka_effective_date)
-    metrics[3].metric("Policy", report.policy_version)
-    st.caption(report.data_sufficiency)
-    st.subheader("Ranked options")
+    st.subheader("So what should you do?")
+    st.success(report.next_actions[0])
+    st.subheader("Your three best moves")
     for rank, option in enumerate(report.options, start=1):
         _render_option(option, rank)
     left, right = st.columns(2, gap="large")
@@ -650,11 +658,45 @@ def _render_result(product_id: str) -> None:
         mime="application/json",
         width="stretch",
     )
+    st.download_button(
+        "Download plain-English decision report",
+        report_to_markdown(report),
+        file_name=f"{product_id}-decision-report.md",
+        mime="text/markdown",
+        width="stretch",
+    )
+    with st.expander("Technical decision identity", expanded=False):
+        metrics = st.columns(4)
+        metrics[0].metric("Decision score", f"{report.score:.1f}/100")
+        metrics[1].metric("Confidence", report.confidence)
+        metrics[2].metric("GKA effective", report.gka_effective_date)
+        metrics[3].metric("Policy", report.policy_version)
+        st.caption(report.data_sufficiency)
+    st.subheader("Ask your consultant about this decision")
+    st.caption(
+        "Unpack the frozen report gradually. Follow-up answers retrieve only evidence already "
+        "inside this decision; they cannot silently change the verdict."
+    )
+    state = _consultation(product_id)
+    for message in state["report_messages"]:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+    follow_up = st.chat_input(
+        "Ask why, explore a risk, compare alternatives or request evidence…",
+        key=f"report-chat-{product_id}",
+    )
+    if follow_up:
+        state["report_messages"].append({"role": "user", "content": follow_up})
+        state["report_messages"].append(
+            {"role": "assistant", "content": answer_report_question(report, follow_up)}
+        )
+        st.rerun()
     _render_narrative(product_id, report)
 
 
 def _render_knowledge(product_id: str) -> None:
     rows, manifest = load_current_gka(ROOT, product_id)
+    atlas = load_decision_atlas(ROOT, product_id)
     catalog = load_metric_catalog(ROOT, product_id)
     metrics_catalog = catalog["metrics"]
     available = sum(item["coverage"] == "available" for item in metrics_catalog)
@@ -668,6 +710,31 @@ def _render_knowledge(product_id: str) -> None:
     cols[1].metric("Currently available", available)
     cols[2].metric("Evidence coverage", f"{available / len(metrics_catalog):.0%}")
     cols[3].metric("GKA effective", manifest["effective_date"])
+    st.subheader("Precomputed Decision Universe")
+    st.write(
+        "Before any customer conversation begins, every covered option is feature-engineered, "
+        "scenario-tested, pathway-classified and checked for robust frontier membership. The "
+        "consultation retrieves from this frozen universe; it does not invent research live."
+    )
+    atlas_cols = st.columns(3)
+    atlas_cols[0].metric("Options processed upfront", atlas["universe_size"])
+    atlas_cols[1].metric("Robust frontier", len(atlas["frontier_ids"]))
+    atlas_cols[2].metric("Atlas schema", atlas["schema_version"])
+    with st.expander("Growth / stable / decline pathway atlas", expanded=True):
+        st.dataframe(
+            [
+                {
+                    "Option": item["option_name"],
+                    "Decision segment": item["segment"],
+                    "Pathway": item["pathway"],
+                    "Pathway score": item["pathway_score"],
+                    "Robust frontier": item["record_id"] in atlas["frontier_ids"],
+                }
+                for item in atlas["entries"]
+            ],
+            width="stretch",
+            hide_index=True,
+        )
     with st.expander("Decision metric catalog", expanded=True):
         st.dataframe(
             [

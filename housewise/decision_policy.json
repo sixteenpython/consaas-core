@@ -1,6 +1,6 @@
 {
-  "policy_version": "1.0.0",
-  "method": "ownership_cashflow_pareto_robust_rank",
+  "policy_version": "2.0.0",
+  "method": "precomputed_pathway_atlas_ownership_cashflow_pareto_robust_rank",
   "verdict_thresholds": {"strong": 68, "conditional": 54},
   "minimum_horizon_years": 5
 }

@@ -10,12 +10,14 @@ The root Streamlit application now contains three bounded, runnable Decision Int
 - **HouseWise** for Indian residential purchase decisions;
 - **StartupEval** for founder and investor venture assessment.
 
-Decision Studio v0.4 adds scenario/Pareto intelligence for education and property plus an
-eleven-question India Problem Observatory and Horse/Jockey engine for startup assessment. Each
-journey uses a free-form adaptive expert conversation, an epistemic and revision-aware
-session-only Case Knowledge Asset, a live Decision Position, a promoted GKA with explicit
-decision-metric coverage, a versioned deterministic policy, explainable recommendations and an
-optional provider-free browser model behind a typed validation gate. Run it with
+Decision Studio v0.5 processes each covered decision universe upfront into a promoted Decision
+Atlas: features, scenarios, Growth/Stable/Persistent/Decline pathways, robust frontiers, model cards
+and validation evidence. CareerSim and HouseWise apply customer constraints to those atlases;
+StartupEval combines its India Problem Observatory with the governed 70% Horse / 30% Jockey engine.
+Each journey uses natural-language adaptive consultation, sensitivity-based stopping, an epistemic
+and revision-aware Case Knowledge Asset, Vriddhi-style plain-English recommendations, downloadable
+full reports and evidence-grounded follow-up dialogue. An optional provider-free browser model sits
+behind a typed validation gate. Run it with
 `streamlit run streamlit_app.py`.
 
 Refresh all three promoted knowledge assets with:
@@ -23,14 +25,15 @@ Refresh all three promoted knowledge assets with:
 ```powershell
 python refresh_monthly.py --effective-date YYYY-MM-DD
 # For a corrected same-day methodology release:
-python refresh_monthly.py --effective-date YYYY-MM-DD --release-tag decision-intelligence-v1
+python refresh_monthly.py --effective-date YYYY-MM-DD --release-tag decision-atlas-v2
 ```
 
 See [Decision Studio architecture](./docs/DECISION_STUDIO_FOUNDATION.md) and the
 [monthly operations runbook](./docs/DECISION_STUDIO_OPERATIONS.md). The v0.3 interaction boundary is
 documented in [Conversational Decision Intelligence](./docs/CONVERSATIONAL_DECISION_INTELLIGENCE.md).
 The v0.4 domain engines are documented in
-[Domain Decision Intelligence v1](./docs/DECISION_STUDIO_REENGINEERING_V1.md).
+[Domain Decision Intelligence v1](./docs/DECISION_STUDIO_REENGINEERING_V1.md). The v0.5 research
+plane is defined in [Decision Universe Architecture](./docs/DECISION_UNIVERSE_ARCHITECTURE.md).
 
 ## Product contract
 

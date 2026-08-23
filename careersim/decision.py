@@ -50,7 +50,10 @@ def _incremental_cashflows(
 
 
 def _candidate(
-    row: dict[str, str], answers: dict[str, Any], budget: float
+    row: dict[str, str],
+    answers: dict[str, Any],
+    budget: float,
+    atlas_entry: dict[str, Any],
 ) -> CareerCandidate | None:
     if row["degree_level"] != answers["degree_level"]:
         return None
@@ -145,6 +148,8 @@ def _candidate(
         round(score, 1),
         fit,
         (
+            f"The precomputed Decision Atlas classifies this as a {atlas_entry['pathway']} "
+            f"pathway ({float(atlas_entry['pathway_score']):.0f}/100).",
             f"Probability-weighted positive-NPV estimate is {positive_probability * 100:.0f}%.",
             f"Ten-year incremental NPV is ₹{npvs[1] / 100000:.1f} lakh in the base "
             f"case and ₹{npvs[0] / 100000:.1f} lakh in the downside case.",
@@ -164,6 +169,10 @@ def _candidate(
             "debt resilience score": round(debt_resilience, 1),
             "evidence authority score": evidence,
             "required funding adjustment ₹": round(adjustment),
+            "precomputed pathway": str(atlas_entry["pathway"]),
+            "cost to risk-adjusted uplift": float(
+                atlas_entry["cost_to_risk_adjusted_uplift"]
+            ),
         },
     )
     return CareerCandidate(
@@ -183,9 +192,24 @@ def decide(
     rows: list[dict[str, str]],
     policy: dict[str, Any],
     manifest: dict[str, Any],
+    atlas: dict[str, Any] | None = None,
 ) -> DecisionReport:
     budget = float(answers["budget_inr"])
-    candidates = [candidate for row in rows if (candidate := _candidate(row, answers, budget))]
+    atlas_by_id = {item["record_id"]: item for item in (atlas or {}).get("entries", [])}
+    fallback = {
+        "pathway": "Unclassified",
+        "pathway_score": 0,
+        "cost_to_risk_adjusted_uplift": 0,
+    }
+    candidates = [
+        candidate
+        for row in rows
+        if (
+            candidate := _candidate(
+                row, answers, budget, atlas_by_id.get(row["record_id"], fallback)
+            )
+        )
+    ]
     objectives = [candidate.objectives for candidate in candidates]
     frontier_indices = pareto_front(
         objectives, ("return", "downside", "affordability", "resilience", "authority")
@@ -224,8 +248,9 @@ def decide(
         ranking_stability([option.score for option in ranked]),
         "Pathway-level reference universe; verify exact programme offer, funding and "
         "current policy",
-        "CareerSim compares complete education cash flows against the no-overseas-study "
-        "counterfactual, then retains robust non-dominated paths.",
+        "CareerSim has already classified the covered overseas-education universe into growth, "
+        "stable and decline pathways. It now applies your constraints, compares complete cash "
+        "flows against not studying overseas, and returns the strongest robust paths.",
         ranked,
         tuple(dict.fromkeys(risk for option in ranked for risk in option.risks)),
         (

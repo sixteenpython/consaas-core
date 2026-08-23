@@ -33,6 +33,16 @@ def test_monthly_refresh_promotes_all_products_and_is_idempotent(tmp_path: Path)
         assert pointer["content_sha256"] == item.content_sha256
         assert (root / pointer["release_path"] / "quality.json").exists()
         assert (root / pointer["release_path"] / "metric_catalog.json").exists()
+        for filename in (
+            "feature_matrix.csv",
+            "growth_decline_classification.csv",
+            "scenario_matrix.json",
+            "pareto_fronts.json",
+            "decision_atlas.json",
+            "model_card.json",
+            "backtest_evidence.json",
+        ):
+            assert (root / pointer["release_path"] / filename).exists()
 
 
 def test_invalid_candidate_does_not_replace_current_release(tmp_path: Path) -> None:

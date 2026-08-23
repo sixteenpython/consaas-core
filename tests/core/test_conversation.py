@@ -6,6 +6,7 @@ from decision_studio.case import CaseKnowledgeAsset
 from decision_studio.conversation import (
     apply_action,
     deterministic_action,
+    deterministic_actions,
     validate_model_action,
 )
 from plugin_sdk.decision import Question
@@ -30,6 +31,20 @@ def test_natural_choice_is_coerced_without_model_inference() -> None:
     assert apply_action(CaseKnowledgeAsset("careersim"), action).values == {
         "career_goal": "Work overseas long term"
     }
+
+
+def test_one_natural_turn_can_establish_multiple_explicit_choice_facts() -> None:
+    degree = Question("degree", "Degree?", "choice", ("Undergraduate", "Master's", "PhD"))
+    region = Question("region", "Region?", "choice", ("United States", "Canada"))
+
+    actions = deterministic_actions(
+        "I am considering a masters in the United States", degree, (degree, region)
+    )
+
+    assert [(action.question_id, action.value) for action in actions] == [
+        ("degree", "Master's"),
+        ("region", "United States"),
+    ]
 
 
 def test_natural_language_answer_is_preserved_for_text_question() -> None:

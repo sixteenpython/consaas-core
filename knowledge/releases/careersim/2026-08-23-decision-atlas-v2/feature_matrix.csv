@@ -1,0 +1,27 @@
+record_id,option_name,segment,pathway,pathway_score,economic_cost_inr,risk_adjusted_annual_uplift_inr,cost_to_risk_adjusted_uplift,downside_salary_uplift_inr,authority_score,affordability_reference,resilience_reference
+career-001,US public STEM undergraduate pathway,Undergraduate · Engineering / technology · United States,Growth,75.66,18100000,3801520,4.76,3600000,58.0,23.5,30.0
+career-002,US selective data undergraduate pathway,Undergraduate · Data / AI · United States,Growth,78.77,20300000,4578840,4.43,4000000,60.0,12.5,27.0
+career-003,Canadian technology undergraduate pathway,Undergraduate · Engineering / technology · Canada,Growth,70.17,13400000,2116800,6.33,2200000,64.0,47.0,37.5
+career-004,Canadian business undergraduate pathway,Undergraduate · Business / management · Canada,Stable,65.7,12800000,1723910,7.42,1800000,61.0,50.0,37.0
+career-005,UK technology undergraduate pathway,Undergraduate · Engineering / technology · United Kingdom,Growth,71.05,13000000,2314260,5.62,2200000,62.0,45.5,33.0
+career-006,UK business undergraduate pathway,Undergraduate · Business / management · United Kingdom,Stable,67.84,12300000,1907400,6.45,1900000,61.0,49.0,32.5
+career-007,Australian applied undergraduate pathway,Undergraduate · Flexible / undecided · Australia,Stable,67.88,11900000,1942080,6.13,2000000,58.0,51.0,40.5
+career-008,European public STEM undergraduate pathway,Undergraduate · Engineering / technology · Europe,Growth,70.93,7300000,1695920,4.3,1700000,55.0,74.0,49.0
+career-009,US STEM master's pathway,Master's · Engineering / technology · United States,Growth,83.47,11200000,4704480,2.38,3800000,62.0,56.0,30.0
+career-010,US data and AI master's pathway,Master's · Data / AI · United States,Growth,84.83,12100000,5318640,2.28,4100000,63.0,52.5,27.5
+career-011,US healthcare analytics master's pathway,Master's · Healthcare / life sciences · United States,Growth,79.58,11400000,4133360,2.76,3500000,58.0,54.0,29.0
+career-012,Canadian data master's pathway,Master's · Data / AI · Canada,Growth,75.28,8600000,2409440,3.57,2000000,66.0,69.0,37.5
+career-013,Canadian engineering master's pathway,Master's · Engineering / technology · Canada,Growth,73.22,8400000,2184160,3.85,1800000,64.0,70.0,38.0
+career-014,UK one-year business master's pathway,Master's · Business / management · United Kingdom,Growth,73.33,7000000,2049300,3.42,1700000,63.0,71.0,33.5
+career-015,UK data master's pathway,Master's · Data / AI · United Kingdom,Growth,75.05,7500000,2364300,3.17,1900000,62.0,69.0,33.0
+career-016,UK public policy master's pathway,Master's · Social sciences / public policy · United Kingdom,Growth,68.2,6500000,1514240,4.29,1300000,58.0,72.5,35.0
+career-017,European public STEM master's pathway,Master's · Engineering / technology · Europe,Growth,74.39,6200000,2031120,3.05,1600000,60.0,81.0,50.0
+career-018,European data and AI master's pathway,Master's · Data / AI · Europe,Growth,76.5,6800000,2388750,2.85,1800000,61.0,79.0,48.0
+career-019,European business master's pathway,Master's · Business / management · Europe,Growth,69.46,7100000,1652400,4.3,1300000,58.0,76.5,46.5
+career-020,Australian professional master's pathway,Master's · Flexible / undecided · Australia,Growth,70.45,8700000,2125200,4.09,1900000,57.0,67.5,39.0
+career-021,Australian healthcare master's pathway,Master's · Healthcare / life sciences · Australia,Growth,73.17,9000000,2471040,3.64,2100000,57.0,66.0,40.5
+career-022,US funded research PhD pathway,PhD · Flexible / undecided · United States,Growth,74.76,8400000,2376000,3.54,2600000,58.0,95.5,36.0
+career-023,European salaried research PhD pathway,PhD · Flexible / undecided · Europe,Growth,72.7,6400000,1705440,3.75,1700000,60.0,98.0,53.5
+career-024,UK funded research PhD pathway,PhD · Flexible / undecided · United Kingdom,Growth,69.91,6900000,1657600,4.16,1800000,58.0,95.5,41.0
+career-025,Canadian funded research PhD pathway,PhD · Flexible / undecided · Canada,Stable,67.91,8200000,1587300,5.17,1700000,57.0,96.5,43.0
+career-026,Australian funded research PhD pathway,PhD · Flexible / undecided · Australia,Growth,68.7,6800000,1610240,4.22,1700000,55.0,96.0,43.5

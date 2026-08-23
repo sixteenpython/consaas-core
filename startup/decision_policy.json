@@ -1,6 +1,6 @@
 {
-  "policy_version": "1.0.0",
-  "method": "india_problem_observatory_horse_jockey_adjudication",
+  "policy_version": "2.0.0",
+  "method": "precomputed_india_problem_atlas_horse_jockey_adjudication",
   "horse_weight": 0.70,
   "jockey_weight": 0.30,
   "horse_dimensions": {"problem reality": 0.20, "pain and frequency": 0.12, "willing payer": 0.18, "remaining white space": 0.10, "solution mechanism": 0.14, "behavioural traction": 0.12, "sustainable economics": 0.14},

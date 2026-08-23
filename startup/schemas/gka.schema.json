@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "methodology_version": "1.0.0",
+  "methodology_version": "2.0.0",
   "required_columns": ["record_id", "domain", "subdomain", "problem_statement", "keywords", "affected_segment", "geography", "problem_reality_score", "severity_score", "frequency_score", "willingness_to_pay_score", "solution_coverage_score", "solution_effectiveness_score", "regulatory_feasibility_score", "whitespace_score", "successful_solution_examples", "remaining_gap", "source_id", "source_url", "observed_on", "confidence"],
   "numeric_columns": ["problem_reality_score", "severity_score", "frequency_score", "willingness_to_pay_score", "solution_coverage_score", "solution_effectiveness_score", "regulatory_feasibility_score", "whitespace_score"]
 }

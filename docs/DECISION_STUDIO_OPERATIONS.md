@@ -9,8 +9,9 @@ python refresh_monthly.py --effective-date 2026-09-22
 ```
 
 The workflow validates all three source seeds and decision-metric catalogs, constructs isolated
-candidates, writes combined content hashes, manifests and quality results, and promotes each release
-atomically. The same date and content is
+candidates, precomputes every covered option into the Decision Atlas, writes feature matrices,
+scenarios, pathway classifications, Pareto frontiers, model cards, temporal-validation status,
+content hashes, manifests and quality results, and promotes each release atomically. The same date and content is
 idempotent. Different content cannot silently overwrite an existing effective date.
 
 ## Before refresh

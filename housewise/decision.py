@@ -52,7 +52,10 @@ def _cashflows(
 
 
 def _candidate(
-    row: dict[str, str], answers: dict[str, Any], policy: dict[str, Any]
+    row: dict[str, str],
+    answers: dict[str, Any],
+    policy: dict[str, Any],
+    atlas_entry: dict[str, Any],
 ) -> HouseCandidate | None:
     if row["city"] != answers["city"]:
         return None
@@ -129,6 +132,8 @@ def _candidate(
         round(score, 1),
         fit,
         (
+            f"The precomputed Decision Atlas classifies this as a {atlas_entry['pathway']} "
+            f"pathway ({float(atlas_entry['pathway_score']):.0f}/100).",
             f"Indicative acquisition cost is ₹{acquisition_cost / 100000:.1f} lakh for "
             f"{size:.0f} sq ft.",
             f"Leveraged equity IRR spans {downside:.1f}% downside to {upside:.1f}% "
@@ -150,6 +155,8 @@ def _candidate(
             "household resilience score": round(resilience, 1),
             "evidence authority score": evidence,
             "required budget adjustment ₹": round(adjustment),
+            "precomputed pathway": str(atlas_entry["pathway"]),
+            "cost to growth and yield": float(atlas_entry["cost_to_growth_and_yield"]),
         },
     )
     return HouseCandidate(
@@ -170,8 +177,19 @@ def decide(
     rows: list[dict[str, str]],
     policy: dict[str, Any],
     manifest: dict[str, Any],
+    atlas: dict[str, Any] | None = None,
 ) -> DecisionReport:
-    candidates = [candidate for row in rows if (candidate := _candidate(row, answers, policy))]
+    atlas_by_id = {item["record_id"]: item for item in (atlas or {}).get("entries", [])}
+    fallback = {"pathway": "Unclassified", "pathway_score": 0, "cost_to_growth_and_yield": 0}
+    candidates = [
+        candidate
+        for row in rows
+        if (
+            candidate := _candidate(
+                row, answers, policy, atlas_by_id.get(row["record_id"], fallback)
+            )
+        )
+    ]
     objectives = [candidate.objectives for candidate in candidates]
     frontier_indices = pareto_front(
         objectives, ("return", "downside", "affordability", "liquidity", "resilience", "authority")
@@ -202,8 +220,9 @@ def decide(
         score,
         ranking_stability([option.score for option in ranked]),
         "Micro-market search-zone evidence; no exact title or project has been approved",
-        "HouseWise simulates complete ownership cash flows and retains robust non-dominated "
-        "search zones before property diligence.",
+        "HouseWise has already classified the covered micro-market universe into growth, stable "
+        "and decline pathways. It applies your affordability and resilience constraints, then "
+        "returns the strongest robust search zones before property diligence.",
         ranked,
         tuple(dict.fromkeys(risk for option in ranked for risk in option.risks)),
         (

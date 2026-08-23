@@ -1,0 +1,29 @@
+record_id,option_name,segment,pathway,pathway_score,net_rental_yield_pct,base_growth_and_yield_pct,downside_price_growth_pct,cost_to_growth_and_yield,authority_score,affordability_reference,resilience_reference
+house-001,Whitefield established search zone,Bengaluru · Whitefield,Growth,74.92,2.11,8.11,1.0,1788.36,62.0,42.0,61.86
+house-002,Sarjapur Road growth search zone,Bengaluru · Sarjapur Road,Stable,71.22,2.26,9.26,-1.0,1274.02,58.0,52.8,54.04
+house-003,Hebbal airport corridor search zone,Bengaluru · Hebbal,Growth,74.05,2.01,8.51,0.0,1585.62,60.0,46.0,62.64
+house-004,Electronic City value search zone,Bengaluru · Electronic City,Stable,68.85,2.6,8.1,-1.0,1048.86,58.0,66.0,58.1
+house-005,Thane established search zone,Mumbai · Thane,Growth,74.18,1.75,6.75,0.0,3108.81,64.0,16.0,63.28
+house-006,Navi Mumbai transit search zone,Mumbai · Navi Mumbai,Stable,74.9,2.01,8.51,-1.0,2055.44,62.0,30.0,60.82
+house-007,Western suburbs established search zone,Mumbai · Western Suburbs,Growth,75.06,1.5,6.5,1.0,4618.23,66.0,0.0,67.64
+house-008,Peripheral Mumbai growth search zone,Mumbai · Peripheral MMR,Stable,64.58,2.26,8.26,-3.0,1513.32,52.0,50.0,48.68
+house-009,Kharadi employment search zone,Pune · Kharadi,Growth,76.05,2.43,8.93,0.0,1343.78,63.0,52.0,66.68
+house-010,Hinjawadi value search zone,Pune · Hinjawadi,Stable,69.94,2.7,9.2,-2.0,924.31,57.0,66.0,58.56
+house-011,Baner established search zone,Pune · Baner,Growth,74.69,2.14,7.94,1.0,1700.25,62.0,46.0,67.9
+house-012,Wagholi growth search zone,Pune · Wagholi,Stable,66.07,2.9,8.7,-3.0,827.59,53.0,71.2,54.4
+house-013,Gachibowli established search zone,Hyderabad · Gachibowli,Growth,76.65,2.24,8.74,1.0,1430.21,63.0,50.0,67.36
+house-014,Kokapet growth search zone,Hyderabad · Kokapet,Stable,73.43,1.99,8.99,-1.0,1223.58,58.0,56.0,61.62
+house-015,Miyapur transit-value search zone,Hyderabad · Miyapur,Growth,71.87,2.83,8.63,0.0,903.41,59.0,68.8,62.44
+house-016,Shamshabad peripheral search zone,Hyderabad · Shamshabad,Stable,62.0,2.38,7.38,-5.0,840.11,49.0,75.2,50.38
+house-017,OMR employment search zone,Chennai · OMR,Stable,69.98,2.36,7.86,-1.0,1144.75,60.0,64.0,54.24
+house-018,Porur established search zone,Chennai · Porur,Growth,70.9,2.21,7.21,0.0,1359.6,61.0,60.8,60.56
+house-019,Medavakkam value search zone,Chennai · Medavakkam,Stable,66.95,2.8,8.3,-2.0,867.89,55.0,71.2,52.68
+house-020,Anna Nagar established search zone,Chennai · Anna Nagar,Growth,74.48,1.79,6.29,1.0,2624.05,65.0,34.0,69.56
+house-021,Noida metro search zone,Delhi NCR · Noida,Stable,73.06,2.18,8.18,-1.0,1406.56,60.0,54.0,59.64
+house-022,Gurugram employment search zone,Delhi NCR · Gurugram,Stable,74.22,1.92,8.42,-1.0,2078.38,62.0,30.0,56.98
+house-023,Ghaziabad value search zone,Delhi NCR · Ghaziabad,Stable,63.87,2.9,7.9,-3.0,860.76,52.0,72.8,53.4
+house-024,Greater Noida growth search zone,Delhi NCR · Greater Noida,Stable,65.37,2.5,8.3,-4.0,867.05,50.0,71.2,50.68
+house-025,New Town established search zone,Kolkata · New Town,Growth,70.61,2.55,7.55,0.0,1125.08,60.0,66.0,62.72
+house-026,Rajarhat growth search zone,Kolkata · Rajarhat,Stable,66.69,2.76,7.96,-2.0,904.75,55.0,71.2,57.6
+house-027,South Kolkata established search zone,Kolkata · South Kolkata,Growth,71.42,2.24,6.54,1.0,1605.5,62.0,58.0,67.48
+house-028,Howrah transit-value search zone,Kolkata · Howrah,Stable,63.97,3.03,7.83,-2.0,830.03,54.0,74.0,56.64

@@ -138,9 +138,15 @@ def decide(
     rows: list[dict[str, str]],
     policy: dict[str, Any],
     manifest: dict[str, Any],
+    atlas: dict[str, Any] | None = None,
 ) -> DecisionReport:
     texts = {key: str(value).strip() for key, value in answers.items()}
     problem, match_score = _problem_match(texts, rows)
+    atlas_by_id = {item["record_id"]: item for item in (atlas or {}).get("entries", [])}
+    problem_atlas = atlas_by_id.get(
+        problem["record_id"],
+        {"pathway": "Unclassified", "problem_opportunity_score": 0},
+    )
     q = {key: _answer_quality(value) for key, value in texts.items()}
     q["solution_outcome"] = _answer_quality(
         texts["solution_outcome"],
@@ -285,11 +291,14 @@ def decide(
         "Jockey (founder execution)": jockey_score,
         "India problem match": round(match_score, 1),
         "White-space evidence": round(horse["remaining white space"], 1),
+        "Precomputed problem pathway": str(problem_atlas["pathway"]),
+        "Problem Opportunity Score": float(problem_atlas["problem_opportunity_score"]),
     }
     evidence = (
         f"{problem['source_id']} · {problem['record_id']} · observed {problem['observed_on']}",
         problem["source_url"],
         f"Matched India problem: {problem['problem_statement']}",
+        f"Precomputed pathway: {problem_atlas['pathway']}",
     )
     options = tuple(
         ScoredOption(
