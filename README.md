@@ -69,7 +69,14 @@ See [FACTORY_STATUS.md](./FACTORY_STATUS.md). Items remain in `REVIEW` until hum
 
 ## Reading order
 
-Start with the [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Vision](./docs/VISION.md), [First Principles](./docs/FIRST_PRINCIPLES.md), [Architecture](./docs/ARCHITECTURE.md), and root [AGENTS.md](./AGENTS.md). Factory operation is defined by [Factory Mode](./docs/FACTORY_MODE.md), [Feature Creator](./docs/FEATURE_CREATOR.md), and the [Definition of Done](./docs/DEFINITION_OF_DONE.md).
+For a new Codex session, start with the consolidated
+[ConSaaS checkpoint](./Endpoint_Codex_ConSaaS.md), then read the root [AGENTS.md](./AGENTS.md), the
+named task sheet and its linked contracts. For deeper platform study, continue with the
+[Constitution](./docs/CONSAAS_CONSTITUTION.md), [Vision](./docs/VISION.md),
+[First Principles](./docs/FIRST_PRINCIPLES.md), and [Architecture](./docs/ARCHITECTURE.md). Factory
+operation is defined by [Factory Mode](./docs/FACTORY_MODE.md),
+[Feature Creator](./docs/FEATURE_CREATOR.md), and the
+[Definition of Done](./docs/DEFINITION_OF_DONE.md).
 
 ## Document map
 
@@ -82,6 +89,7 @@ Start with the [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Vision](./docs/V
 - Factory: [Constitution](./docs/CONSAAS_CONSTITUTION.md), [Factory Mode](./docs/FACTORY_MODE.md), [Quality Gates](./docs/QUALITY_GATES.md), [Architecture Guardrails](./docs/ARCHITECTURE_GUARDRAILS.md), [Initial Backlog](./docs/INITIAL_FACTORY_BACKLOG.md)
 - Assurance: [AI Evaluation](./docs/AI_EVALUATION.md), [Security](./docs/SECURITY.md), [Privacy](./docs/PRIVACY.md), [Observability](./docs/OBSERVABILITY.md), [Reproducibility](./docs/REPRODUCIBILITY.md)
 - Integrated reference: [Vriddhi–ConSaaS Architecture Solution](./docs/vriddhi-consaas-arthitecture-solution.md)
+- Continuity: [Endpoint Codex — ConSaaS](./Endpoint_Codex_ConSaaS.md)
 
 ## Local verification
 

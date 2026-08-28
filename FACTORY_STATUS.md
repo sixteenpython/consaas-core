@@ -2,6 +2,10 @@
 
 **Bootstrap state:** implementation complete locally; human and GitLab review pending.
 
+**Continuity checkpoint:** `Endpoint_Codex_ConSaaS.md` is the authoritative cold-start handoff for
+free-tier Codex and junior-developer execution across the product family. It supplies orientation;
+current tasks, code, ADRs, `AGENTS.md` files and tests remain implementation authority.
+
 ## Operational capabilities
 
 - Constitution, factory lifecycle, Definition of Done, standards, and scoped agent instructions
