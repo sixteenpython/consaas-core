@@ -36,6 +36,8 @@
 - Added hosted-demo privacy disclosure and a local-private runtime profile.
 - Added domain, application, compiler, import/export, and Streamlit smoke tests.
 
-Known limits: no LLM, durable database, PDF screenplay output/import, SDI/iMaSc analysis, Doctor mode,
-authentication, or collaboration. Hosted-demo content is processed by the Streamlit host and must not
-be confidential.
+Known limits: no durable database, PDF screenplay output/import, evidence-bound SDI Four-Pillar
+analysis, Doctor mode, authentication, or collaboration. Optional generation is local and loopback-only;
+the hosted profile uses deterministic skill blueprints. The current iMaSc-derived craft score is a
+revision aid rather than expert review or success prediction. Hosted-demo content is processed by the
+Streamlit host and must not be confidential.

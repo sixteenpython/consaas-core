@@ -821,7 +821,9 @@ The 0.3 release validation includes:
 - headless Streamlit smoke test;
 - local and deployed browser verification of Phase 5 and Phase 6.
 
-The Narrative-only suite passed 23 tests at the 0.2 deployment boundary.
+The Narrative-only suite passed 25 tests at the 0.3 deployment boundary. The repository-wide
+regression suite passed 89 tests for the same release, alongside lint, formatting, focused type checks,
+architecture guardrails, local browser review, and post-deployment verification.
 
 ---
 
