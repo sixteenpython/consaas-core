@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from narrative_architect.construction.scoring import assess_screenplay
 from narrative_architect.knowledge.nka import NarrativeState, NKARevision
 
-COMPILER_VERSION = "screenplay-fountain/2"
+COMPILER_VERSION = "screenplay-fountain/3"
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,21 +103,32 @@ def compile_scorecard_markdown(revision: NKARevision) -> str:
         f"**Source NKA revision:** `{revision.revision_id}`  ",
         f"**Structure:** {state.structure_type or 'Not established'}  ",
         f"**Structural coverage:** {report.coverage_percent}%  ",
-        f"**iMaSc construction score:** {report.imasc_construction_score_0_5:.2f}/5",
+        f"**Completion coverage:** {report.completion_coverage_score_0_5:.2f}/5  ",
+        f"**Craft quality:** {report.craft_quality_score_0_5:.2f}/5  ",
+        f"**Scenes retaining scaffold or placeholder language:** {report.template_scene_count}",
         "",
-        "> This score measures explicit screenplay-construction coverage under the declared rubric. It is not an IMDb score and is not a prediction of audience or commercial success.",
+        "> Completion measures whether required evidence exists. Craft quality measures deterministic, story-specific construction evidence and is capped when scaffold or placeholder language remains. This is not an IMDb score and it is not a prediction of audience or commercial success.",
         "",
         "## Scene scorecard",
         "",
-        "| # | Scene | Conflict | Character | Plot | Blocking | Placement | Weighted |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|",
+        "| # | Scene | Completion | Conflict | Character | Plot | Blocking | Placement | Craft |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for index, card in enumerate(report.scenes, 1):
         values = {dimension.name: dimension.score_0_5 for dimension in card.dimensions}
         lines.append(
-            f"| {index} | {card.scene_heading} | {values['Conflict']} | "
+            f"| {index} | {card.scene_heading} | {card.completion_score_0_5:.2f} | {values['Conflict']} | "
             f"{values['Character development']} | {values['Plot function']} | "
-            f"{values['Blocking & staging']} | {values['Placement']} | {card.weighted_score_0_5:.2f} |"
+            f"{values['Blocking & staging']} | {values['Placement']} | {card.craft_quality_score_0_5:.2f} |"
+        )
+    flagged = [(card.scene_heading, flag) for card in report.scenes for flag in card.quality_flags]
+    if flagged:
+        lines.extend(
+            [
+                "",
+                "## Craft-evidence flags",
+                *[f"- **{heading}:** {flag}" for heading, flag in flagged],
+            ]
         )
     if report.strengths:
         lines.extend(["", "## Construction strengths", *[f"- {item}" for item in report.strengths]])

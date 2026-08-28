@@ -1,6 +1,7 @@
 # ruff: noqa: E501
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -12,7 +13,12 @@ from narrative_architect.construction.blueprints import (
     suggest_centre_knots,
     suggest_characters,
 )
-from narrative_architect.construction.scoring import assess_screenplay, build_complete
+from narrative_architect.construction.scoring import (
+    BOILERPLATE_MARKERS,
+    assess_scene,
+    assess_screenplay,
+    build_complete,
+)
 from narrative_architect.create.compiler import compile_scorecard_markdown
 from narrative_architect.inference import LocalModelError, OllamaLocalModel
 from narrative_architect.knowledge.nka import InMemoryProjectRepository, NKAValidationError
@@ -53,7 +59,9 @@ def test_demo_is_a_complete_scene_construction_blueprint() -> None:
     assert state.locked_phases == (1, 2, 3, 4, 5)
     assert len(state.beats) == len(state.scenes) == 8
     assert scorecard.coverage_percent == 100
-    assert scorecard.imasc_construction_score_0_5 >= 4.0
+    assert scorecard.completion_coverage_score_0_5 == 5.0
+    assert scorecard.craft_quality_score_0_5 == 3.0
+    assert scorecard.template_scene_count == 8
     assert complete and not blockers
 
 
@@ -62,9 +70,50 @@ def test_scorecard_is_source_bound_and_does_not_claim_success_prediction() -> No
     report = compile_scorecard_markdown(repository.head)
 
     assert repository.head_revision_id in report
-    assert "iMaSc construction score" in report
+    assert "Completion coverage" in report
+    assert "Craft quality" in report
+    assert "Craft-evidence flags" in report
     assert "not an IMDb score" in report
     assert "not a prediction" in report
+
+
+def test_story_grounded_scene_plan_uses_canonical_people_places_and_causality() -> None:
+    state = demo_repository().head.state
+    opening = state.scenes[0]
+
+    assert opening.heading == "INT. LIGHTHOUSE LANTERN ROOM - DAY"
+    assert "Mira Sen" in opening.summary
+    assert "Dev Rao" in opening.summary
+    assert "beacon switch" in opening.summary
+    assert "call sign" in opening.summary
+    assert "call sign" in opening.turning_point
+    assert "locate the transmission source" in opening.turning_point
+    assert not any(marker in opening.summary.lower() for marker in BOILERPLATE_MARKERS)
+
+
+def test_populated_boilerplate_has_full_completion_but_low_craft_and_blocks_build() -> None:
+    repository = demo_repository()
+    state = repository.head.state
+    opening = replace(
+        state.scenes[0],
+        heading="INT. OPENING STATE SPACE - DAY",
+        location="Opening State space",
+        escalation="The first tactic fails and forces a more revealing, costly action.",
+        turning_point="A choice changes the meaning or direction of opening state.",
+        outcome="The event is completed and causally launches the next structural movement.",
+        character_behavior="The character demonstrates the arc through a visible choice under pressure.",
+        dialogue_text="A short tactical exchange turns when behavior reveals what the words conceal.",
+        blocking="Movement through the location externalizes control, resistance and the turn.",
+    )
+    degraded = replace(state, scenes=(opening, *state.scenes[1:]))
+    card = assess_scene(opening, degraded)
+    complete, blockers = build_complete(degraded)
+
+    assert card.completion_score_0_5 == 5.0
+    assert card.craft_quality_score_0_5 <= 2.0
+    assert any("Generic template" in flag for flag in card.quality_flags)
+    assert not complete
+    assert any(opening.heading in blocker for blocker in blockers)
 
 
 def test_structure_and_character_intelligence_reads_canonical_state() -> None:

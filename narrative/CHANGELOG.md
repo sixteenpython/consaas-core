@@ -1,5 +1,18 @@
 # Narrative Architect Changelog
 
+## 0.3.0 — Story-grounded Scene Craft
+
+- Replaced structural-space scene placeholders with story-grounded proposals using approved beats,
+  characters, objectives, stakes, behavior, playable locations/props and adjacent causal events.
+- Split completion coverage from craft quality throughout Phase 5, Phase 6 and downloadable
+  scorecards.
+- Added deterministic detection and score caps for boilerplate, structural placeholder locations,
+  architect scaffolds and archetypal cast names.
+- Hardened the Phase 5 build gate: full fields can no longer conceal sub-floor craft evidence.
+- Added regression coverage proving that populated boilerplate receives full completion but low
+  craft quality.
+- Advanced the bounded Fountain compiler and release metadata to version 3 / Builder 0.3.0.
+
 ## 0.2.0 — Screenplay Construction Studio
 
 - Rebuilt the product around six author-approved construction phases.

@@ -80,7 +80,8 @@ def test_demo_compiler_is_deterministic_and_source_bound() -> None:
 
     assert report.can_compile
     assert first == second
-    assert "INT. OPENING STATE SPACE - DAY" in first
+    assert "INT. LIGHTHOUSE LANTERN ROOM - DAY" in first
+    assert "Mira Sen" in first
     assert repository.head_revision_id in first
     assert "accepted Narrative Knowledge Asset" in first
 

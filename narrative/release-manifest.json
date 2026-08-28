@@ -1,19 +1,20 @@
 {
-  "release_id": "narrative-screenplay-builder-0.2.0",
+  "release_id": "narrative-screenplay-builder-0.3.0",
   "product": "narrative-architect",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "source_branch": "main",
   "entrypoint": "narrative/streamlit_app.py",
   "runtime_profile": "hosted_demo",
   "nka_schema": "narrative-nka/alpha-2",
-  "compiler": "screenplay-fountain/2",
+  "compiler": "screenplay-fountain/3",
   "models": ["optional local qwen2.5:7b-instruct via Ollama"],
   "external_llm_services": [],
   "durable_storage": false,
   "known_limits": [
     "No screenplay PDF import",
     "Hosted profile uses deterministic skill blueprints rather than generative inference",
-    "Construction score is diagnostic and not a commercial-success prediction",
+    "Craft quality is a deterministic revision aid, not an expert review or commercial-success prediction",
+    "Generated scene proposals retain a disclosed scaffold cap until author or local-model refinement",
     "No server-side durable project storage"
   ]
 }

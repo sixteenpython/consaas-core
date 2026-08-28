@@ -729,9 +729,9 @@ sis_mean_0_5 = sis_total_0_20 / 4
 
 A bare `impact_score` is forbidden because it hides the scale. SDI and iMaSc must remain labelled rather than silently blended.
 
-### 25.3 Current score meaning
+### 25.3 Score meaning and the Version 0.3 correction
 
-Version 0.2’s deterministic score is a **construction-readiness/completeness score**. It tests whether the scene card contains evidence-bearing components. It does not yet reliably judge the craft quality of the prose or dramatic execution.
+Version 0.2’s deterministic score was a **construction-readiness/completeness score**. It tested whether the scene card contained evidence-bearing components, but did not reliably judge the craft quality of the prose or dramatic execution.
 
 This distinction became visible in the “Accidental Chef” test:
 
@@ -740,28 +740,28 @@ This distinction became visible in the “Accidental Chef” test:
 - the deterministic score reached 5/5;
 - several fields still contained generic scaffolding such as “the first tactic fails” or “a choice changes the direction.”
 
-Therefore a current 5/5 proves complete structural scaffolding, not a genuinely excellent scene.
+That result proved complete structural scaffolding, not a genuinely excellent scene. Version 0.3 removes this ambiguity by reporting **completion coverage** and **craft quality** independently. A populated field may improve completion without improving craft.
 
-## 26. Required scoring correction
+## 26. Implemented scoring correction
 
-The next scoring architecture must separate:
+The Version 0.3 scoring architecture separates:
 
 1. **Construction coverage** — deterministic presence, references, structural mapping, and field completeness.
 2. **Craft assessment** — evidence-based specificity, causality, escalation, character revelation, playable behavior, dialogue tactics, subtext, and uniqueness.
 
-Recommended next gate:
+The current build gate is:
 
 ```text
 build_complete =
     structural_coverage == 100%
     AND every scene has complete required fields
-    AND no scene contains template placeholders
-    AND no two scenes duplicate the same dramatic function
+    AND every scene reaches the craft-evidence floor
     AND evidence-based craft assessment clears the configured floor
-    AND unresolved continuity obligations are acknowledged
 ```
 
-Template language should cap craft quality at a low score. A model-generated score must include exact scene evidence and remain untrusted until deterministic validation accepts the evidence references.
+Deterministic checks now detect known boilerplate, structural-space headings, architect scaffold phrases, and archetypal cast names. Generic or placeholder language caps craft quality even when completion reaches 5/5. Story-grounded deterministic drafts are deliberately capped at the 3/5 revision-ready floor until an author or approved local model completes the craft pass. A model-generated score must include exact scene evidence and remains untrusted until deterministic validation accepts the evidence references.
+
+Repeated dramatic-function detection and continuity-obligation analysis remain subsequent hardening steps; Version 0.3 does not claim to solve them.
 
 ## 27. Compiler and outputs
 
@@ -778,7 +778,8 @@ The scorecard includes:
 - source revision;
 - selected structure;
 - structural coverage;
-- iMaSc construction score;
+- completion coverage and craft quality as separate measures;
+- scaffold/placeholder scene count and per-scene flags;
 - per-scene dimension scores;
 - strengths and revision priorities;
 - an explicit non-predictive disclaimer.
@@ -801,13 +802,15 @@ The main workspace makes the current construction object—not provider configur
 
 ## 29. Narrative release verification
 
-The 0.2 release validation includes:
+The 0.3 release validation includes:
 
 - immutable revision and stale-write tests;
 - restore-as-new-revision tests;
 - current-bundle round trip and tamper rejection;
 - Foundation `alpha-1` migration test;
 - phase-order and lock-gate tests;
+- story-grounded scene generation tests;
+- populated-boilerplate score-cap and build-blocker regression tests;
 - centre-knot and character proposal tests;
 - structure recommendation and beat-template tests;
 - complete demo structural-coverage test;
@@ -937,12 +940,12 @@ Shared requirements:
 
 ### Narrative Architect
 
-- Public Streamlit Builder v0.2.0.
+- Public Streamlit Builder v0.3.0.
 - Six construction phases and immutable NKA `alpha-2`.
 - Hosted deterministic skill blueprints.
 - Optional private loopback Ollama route.
 - Fountain, scorecard, and project downloads.
-- Current Phase 5 score is explicitly construction readiness, pending craft-quality hardening.
+- Phase 5 reports completion separately from deterministic craft evidence and caps scaffold language.
 
 ## 37. Next-session priorities
 
@@ -956,14 +959,13 @@ Shared requirements:
 
 ### Narrative Architect
 
-1. Replace generic scene scaffolds with story-specific skill/model generation.
-2. Split construction coverage from craft quality.
-3. Detect template placeholders and repeated dramatic functions.
-4. Add evidence-bound SDI Four-Pillar assessment alongside labelled iMaSc.
-5. Add continuity, setup/payoff, character-arc, and scene-sequence dependency checks.
-6. Package skills with schemas, rubrics, examples, and evals.
-7. Add model-run provenance and proposal-review diffs.
-8. Expand Fountain compilation from scene cards into genuinely playable action and dialogue.
+1. Detect repeated dramatic functions across adjacent scenes.
+2. Add evidence-bound SDI Four-Pillar assessment alongside labelled iMaSc.
+3. Add continuity, setup/payoff, character-arc, and scene-sequence dependency checks.
+4. Package skills with schemas, rubrics, examples, and evals.
+5. Add model-run provenance and proposal-review diffs.
+6. Expand Fountain compilation from scene cards into genuinely playable action and dialogue.
+7. Calibrate deterministic craft checks against independent screenplay-expert review.
 
 ## 38. Source map
 
@@ -987,7 +989,7 @@ Shared requirements:
 - `narrative/src/narrative_architect/knowledge/nka.py` — canonical immutable screenplay asset.
 - `narrative/src/narrative_architect/application/projects.py` — author-approved construction services and phase locks.
 - `narrative/src/narrative_architect/construction/blueprints.py` — deterministic plot, cast, structure, and phase intelligence.
-- `narrative/src/narrative_architect/construction/scoring.py` — iMaSc construction-readiness arithmetic.
+- `narrative/src/narrative_architect/construction/scoring.py` — separate completion/craft arithmetic, quality flags, caps, and build gates.
 - `narrative/src/narrative_architect/inference/local_model.py` — loopback-only Ollama boundary.
 - `narrative/src/narrative_architect/create/compiler.py` — Fountain and scorecard compilation.
 - `narrative/src/narrative_architect/ui/app.py` — six-phase Streamlit studio.

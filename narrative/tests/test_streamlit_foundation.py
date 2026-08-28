@@ -22,4 +22,12 @@ def test_screenplay_builder_renders_without_exception() -> None:
     )
     assert "Narrative Architect" in visible_text
     assert "Skill-library intelligence" in visible_text
+    assert "Builder v0.3.0" in visible_text
     assert "Hosted construction demo" in visible_text
+
+    next(button for button in app.button if button.label == "Load demo").click().run(timeout=30)
+
+    metric_labels = {metric.label for metric in app.metric}
+    assert {"Completion coverage", "Craft quality", "Scenes needing craft pass"}.issubset(
+        metric_labels
+    )

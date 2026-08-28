@@ -30,7 +30,7 @@ from narrative_architect.create.compiler import (
 from narrative_architect.inference import LocalModelError, OllamaLocalModel
 from narrative_architect.knowledge.nka import InMemoryProjectRepository, NKAValidationError
 
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0"
 PHASES = (
     "Centre Knot",
     "Characters",
@@ -553,7 +553,7 @@ def _render_phase_five() -> None:
     )
     if st.button("Generate one editable scene card per structural beat", type="secondary"):
         _service().generate_scene_plan()
-        _flash("Generated an editable scene blueprint from the locked structure.")
+        _flash("Generated story-grounded scene drafts from the locked blueprint.")
         st.rerun()
     if not state.scenes:
         st.info(
@@ -561,24 +561,30 @@ def _render_phase_five() -> None:
         )
         return
     report = assess_screenplay(state)
-    col1, col2, col3 = st.columns(3)
-    col1.metric("iMaSc construction", f"{report.imasc_construction_score_0_5:.2f}/5")
-    col2.metric("Structural coverage", f"{report.coverage_percent}%")
-    col3.metric("Engineered scenes", len(report.scenes))
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Completion coverage", f"{report.completion_coverage_score_0_5:.2f}/5")
+    col2.metric("Craft quality", f"{report.craft_quality_score_0_5:.2f}/5")
+    col3.metric("Structural coverage", f"{report.coverage_percent}%")
+    col4.metric("Scenes needing craft pass", report.template_scene_count)
+    st.caption(
+        "Completion asks whether the construction evidence exists. Craft quality asks whether it is story-specific and playable; scaffold language cannot receive a high score."
+    )
     selected = st.selectbox(
         "Open scene card", state.scenes, format_func=lambda item: f"{item.ordinal}. {item.heading}"
     )
     card = next(item for item in report.scenes if item.scene_id == selected.scene_id)
     st.markdown(
         " ".join(f"`{item.name}: {item.score_0_5}/5`" for item in card.dimensions)
-        + f" &nbsp; **Weighted {card.weighted_score_0_5:.2f}/5**"
+        + f" &nbsp; **Completion {card.completion_score_0_5:.2f}/5 · Craft {card.craft_quality_score_0_5:.2f}/5**"
     )
+    for flag in card.quality_flags:
+        st.warning(flag)
     with st.expander("Edit complete scene card", expanded=True):
         _scene_form(selected)
     complete, blockers = build_complete(state)
     if complete:
         st.success(
-            "Every beat is covered and every scene meets the 3.0/5 construction-readiness floor."
+            "Every beat is covered, required evidence is complete, and every scene meets the 3.0/5 craft-readiness floor."
         )
         if st.button("Mark build complete · proceed to final phase", type="primary"):
             _lock(5, "Build complete. Proceed to the final compilation and scorecard.")
@@ -600,12 +606,13 @@ def _render_phase_six() -> None:
         st.error("Compilation is blocked: " + " ".join(readiness.blockers))
         return
     st.success("Build complete · the accepted construction can be compiled.")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("First-draft iMaSc construction", f"{report.imasc_construction_score_0_5:.2f}/5")
-    col2.metric("Structural coverage", f"{report.coverage_percent}%")
-    col3.metric("Canonical revision", repository.head.revision_id[:12])
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Completion coverage", f"{report.completion_coverage_score_0_5:.2f}/5")
+    col2.metric("First-draft craft quality", f"{report.craft_quality_score_0_5:.2f}/5")
+    col3.metric("Structural coverage", f"{report.coverage_percent}%")
+    col4.metric("Canonical revision", repository.head.revision_id[:12])
     st.caption(
-        "This construction score measures explicit rubric coverage. It is not an IMDb score or a prediction of audience or commercial success."
+        "Completion and deterministic craft evidence are reported separately. Scores are capped while scaffold or placeholder language remains; neither score predicts audience or commercial success."
     )
     fountain = compile_bounded_fountain(repository.head)
     scorecard = compile_scorecard_markdown(repository.head)
@@ -634,7 +641,12 @@ def _render_phase_six() -> None:
     with st.expander("Scene-by-scene scorecard", expanded=True):
         rows = []
         for card in report.scenes:
-            row = {"Scene": card.scene_heading, "Weighted /5": card.weighted_score_0_5}
+            row = {
+                "Scene": card.scene_heading,
+                "Completion /5": card.completion_score_0_5,
+                "Craft /5": card.craft_quality_score_0_5,
+                "Craft flags": " ".join(card.quality_flags) or "None",
+            }
             row.update({dimension.name: dimension.score_0_5 for dimension in card.dimensions})
             rows.append(row)
         st.dataframe(rows, width="stretch", hide_index=True)

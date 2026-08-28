@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import replace
+from dataclasses import asdict, replace
 from typing import Any
 
 from narrative_architect.construction.blueprints import (
     CharacterOption,
+    build_scene_blueprints,
     phase_completion,
     structure_beats,
 )
@@ -149,7 +150,7 @@ class StoryProjectService:
     ) -> NKARevision:
         if not name.strip():
             raise NKAValidationError("character name must not be empty")
-        details = {
+        details: dict[str, Any] = {
             "external_objective": external_objective.strip(),
             "internal_need": internal_need.strip(),
             "motivation": motivation.strip(),
@@ -218,7 +219,7 @@ class StoryProjectService:
     ) -> NKARevision:
         if not heading.strip() or not summary.strip():
             raise NKAValidationError("scene heading and summary are required")
-        details = {
+        details: dict[str, Any] = {
             "location": location.strip(),
             "time_of_day": time_of_day.strip().upper() or "DAY",
             "structural_beat_id": structural_beat_id,
@@ -261,42 +262,13 @@ class StoryProjectService:
         state = self.head.state
         if not state.beats:
             raise NKAValidationError("lock a screenplay structure before building scenes")
-        protagonist = next(
-            (c for c in state.characters if c.role == "Protagonist"),
-            state.characters[0] if state.characters else None,
-        )
-        counterforce = next((c for c in state.characters if c.role == "Antagonist"), None)
-        ids = tuple(c.character_id for c in (protagonist, counterforce) if c)
-        scenes = []
-        for beat in state.beats:
-            event = beat.event
-            scenes.append(
-                Scene.create(
-                    beat.ordinal,
-                    f"INT. {beat.label.upper()} SPACE - DAY",
-                    event,
-                    location=f"{beat.label} space",
-                    structural_beat_id=beat.beat_id,
-                    viewpoint_character_id=protagonist.character_id if protagonist else "",
-                    entry_state=f"The previous choice leaves the characters under pressure before {beat.label.lower()}.",
-                    objective=f"Advance the {beat.label.lower()} event: {event}",
-                    conflict=f"The counterforce makes the approved central conflict immediate: {state.central_conflict}",
-                    escalation="The first tactic fails and forces a more revealing, costly action.",
-                    turning_point=f"A choice changes the meaning or direction of {beat.label.lower()}.",
-                    outcome="The event is completed and causally launches the next structural movement.",
-                    emotional_change="The viewpoint character leaves with a changed belief, relationship or level of resolve.",
-                    character_behavior="The character demonstrates the arc through a visible choice under pressure.",
-                    dialogue_context="Both sides want incompatible outcomes and cannot state their deepest fear directly.",
-                    dialogue_text="A short tactical exchange turns when behavior reveals what the words conceal.",
-                    dialogue_subtext="The spoken objective masks the relationship need driving the scene.",
-                    blocking="Movement through the location externalizes control, resistance and the turn.",
-                    setup_payoff="Pays or plants a specific story element used by an adjacent structural beat.",
-                    character_ids=ids,
-                )
-            )
+        scenes = [
+            Scene.create(blueprint_index, **asdict(blueprint))
+            for blueprint_index, blueprint in enumerate(build_scene_blueprints(state), 1)
+        ]
         return self._commit(
             _invalidate_from(replace(state, scenes=tuple(scenes)), 5),
-            "Generate engineered scene plan",
+            "Generate story-grounded scene plan",
         )
 
     def restore(self, revision_id: str) -> NKARevision:
